@@ -2,6 +2,56 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const { OAuth2Client } = require('google-auth-library');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const googleLogin = async (req, res) => {
+  const { token } = req.body;  // The token received from frontend
+
+  try {
+    // Verify the Google token
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,  // The Client ID
+    });
+
+    const payload = ticket.getPayload();
+    const { sub, name, email } = payload;
+
+    // Check if the user already exists in the database
+    let user = await User.findOne({ googleId: sub });
+
+    // If user doesn't exist, create a new user
+    if (!user) {
+      user = new User({
+        googleId: sub,  // Store the Google ID for future logins
+        name,
+        email,
+      });
+
+      // Save the new user to the database
+      await user.save();
+    }
+
+    // Create a JWT token for the user (whether they were created or found)
+    const jwtToken = jwt.sign({ googleId: sub, name, email }, process.env.JWT_SECRET);
+
+    // Send the token and user info in the response
+    res.json({
+      token: jwtToken,
+      name: user.name,
+      email: user.email,
+      message: 'Login successful!',
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: 'Invalid Google token or error verifying token' });
+  }
+};
+
+
 
 const userSignup = async (req, res) => {
   try {
@@ -97,4 +147,4 @@ const getUserLoggedin = async (req, res) => {
 };
 
 
-module.exports = { userLogin, userSignup, getUserLoggedin, getAllUsers };
+module.exports = { userLogin, userSignup, getUserLoggedin, getAllUsers, googleLogin };

@@ -39,19 +39,9 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar className="w-64 bg-white h-screen">
+    <Sidebar className="w-64 bg-white h-screen py-16">
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="px-4 py-4">
-            <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold flex items-center space-x-2">
-                <FaBookReader className="text-black" />
-                <span className="text-black">CookBook</span>
-              </h1>
-            </div>
-          </SidebarGroupLabel>
-        </SidebarGroup>
-
+        
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>

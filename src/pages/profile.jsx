@@ -9,6 +9,7 @@ export default function Profile() {
   const [date, setDate] = useState(new Date());
   const [query, setQuery] = useState("");
   const [userData, setUserData] = useState(null);
+  const [googleUser, setGoogleUser] = useState(null);
   const [recipe, setRecipe] = useState([]);
   const [following, setFollowing] = useState(30);
   const [followers, setFollowers] = useState(100);
@@ -22,41 +23,58 @@ export default function Profile() {
     const token = localStorage.getItem("authToken");
     console.log("Retrieved Token:", token);
 
+    const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
+    console.log("Retrieved Google User:", storedGoogleUser);
+
     if (!token) {
       console.log("No token found");
       return;
     }
 
-    const decodedToken = jwtDecode(token);
-    const userId = decodedToken.userId;
+    try {
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.userId;
 
-    const fetchRecipe = async () => {
-      try {
-        const response = await axios.get(RECIPEbyUSER_API(userId), {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setRecipe(response.data);
-        console.log(response.data);
-      } catch (error) {}
-    };
-
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get(LOGGEDUSER_API(userId), {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUserData(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+      if (storedGoogleUser) {
+        setUserData(storedGoogleUser);
       }
-    };
-    fetchRecipe();
-    fetchUserData();
+
+      const googleUserId = storedGoogleUser?._id;
+      console.log("Google User ID:", googleUserId);
+
+      const fetchRecipe = async () => {
+        try {
+          const response = await axios.get(RECIPEbyUSER_API(userId), {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setRecipe(response.data);
+          console.log("Recipe Data:", response.data);
+        } catch (error) {
+          console.error("Error fetching recipe data:", error);
+        }
+      };
+
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get(LOGGEDUSER_API(userId), {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUserData(response.data);
+          console.log("User Data:", response.data);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      };
+
+      fetchRecipe();
+      fetchUserData();
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
   }, []);
 
   const timeSince = (date) => {
@@ -79,7 +97,7 @@ export default function Profile() {
         return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
       }
     }
-    return "just now";
+    return "Just now";
   };
 
   return (
@@ -89,7 +107,7 @@ export default function Profile() {
           <div className="p-16 rounded-full bg-gray-200"></div>
           <div className="flex flex-col justify-center space-y-2">
             <p className="font-bold text-xl">{userData?.name}</p>
-            <button className="bg-gray-200 py-2 px-2 rounded-[5px]">
+            <button className="bg-gray-200 py-2 px-6 rounded-[5px] self-start">
               Edit Profile
             </button>
           </div>
@@ -123,9 +141,12 @@ export default function Profile() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="recipes" className="">
-          <div className="flex justify-end items-end w-full pb-4"> 
-            <button className="bg-black text-white py-1 px-4 flex flex-row items-center font-medium text-sm rounded-md"><FaPlus className="mr-2" size={12}/>Add Recipe</button>
-          </div>
+            <div className="flex justify-end items-end w-full pb-4">
+              <button className="bg-black text-white py-1 px-4 flex flex-row items-center font-medium text-sm rounded-md">
+                <FaPlus className="mr-2" size={12} />
+                Add Recipe
+              </button>
+            </div>
             <div className="space-y-4">
               {recipe.length > 0 ? (
                 recipe.map((recipes) => (
@@ -154,7 +175,7 @@ export default function Profile() {
                       </div>
 
                       <div>
-                      <h3 className="font-medium text-md">Instructions</h3>
+                        <h3 className="font-medium text-md">Instructions</h3>
                         <ol>
                           {recipes.instructions.map((instruction, index) => (
                             <li key={index} className="text-sm">

@@ -4,12 +4,13 @@ import { Input } from "@/components/ui/input";
 import { FaGoogle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom"; 
 import axios from "axios";
-
+import GoogleLoginButton from "../components/googleLogin";
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 export default function Landing() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const LOGIN_API = "http://localhost:5000/api/user/login";
-
+const GOOGLE_LOGIN = "http://localhost:5000/api/user/google-login"
   const navigate = useNavigate();
 
 
@@ -20,6 +21,7 @@ export default function Landing() {
   const handlePasswordChange = (value) => {
     setPassword(value);
   };
+
 
   const handleLogin = async () => {
     try {
@@ -55,6 +57,38 @@ export default function Landing() {
   const createAccount = () => {
     navigate("/signup");
   }
+
+  const handleLoginSuccess = async (response) => {
+    try {
+      const token = response.credential;  
+  
+      const { data } = await axios.post(GOOGLE_LOGIN, {
+        token: token, 
+      });
+  
+      localStorage.setItem('authToken', data.token);
+ // Storing the user data in localStorage
+localStorage.setItem('googleUser', JSON.stringify({  name: data.name, email: data.email,  _id: data._id }));
+
+// Retrieving the user data from localStorage
+const googleUser = JSON.parse(localStorage.getItem('googleUser'));
+
+// Log the retrieved user data
+console.log(googleUser);
+
+      navigate("/home");
+      
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Login failed. Please try again.');
+    }
+  };
+  
+  const handleLoginFailure = (error) => {
+    console.error('Login Failed:', error);
+    alert('Login failed. Please try again.');
+  };
+  
 
   return (
     <div className="w-90 h-screen flex flex-row items-center bg-white">
@@ -96,12 +130,15 @@ export default function Landing() {
             <div className="border-t-2 border-gray-200 flex-1"></div>
           </div>
           <div className="py-6">
-            <button className="bg-black text-white text-sm font-medium px-2 py-2 w-full rounded-md flex flex-row items-center justify-center">
-              Continue with
-              <span className="ml-2">
-                <FaGoogle size={16} />
-              </span>
-            </button>
+          <GoogleOAuthProvider clientId="144695496725-qsqbpkfb3nhr5f844jkf05sjpt1u17mc.apps.googleusercontent.com">
+        <GoogleLogin
+          onSuccess={handleLoginSuccess}
+          onError={handleLoginFailure}
+          theme="filled_blue"
+          text="Sign in with Google"
+          width="300"
+        />
+      </GoogleOAuthProvider>
           </div>
         </div>
       </div>
