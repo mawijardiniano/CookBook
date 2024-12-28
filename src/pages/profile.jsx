@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { formatDistanceToNow } from "date-fns";
-import { FaPlus } from "react-icons/fa";
+import { FaBookmark, FaPlus } from "react-icons/fa";
+import AddRecipeButton from "../components/addRecipeButton";
+import EditProfileButton from "../components/editProfileButton";
 
 export default function Profile() {
   const [date, setDate] = useState(new Date());
@@ -33,18 +34,21 @@ export default function Profile() {
 
     try {
       const decodedToken = jwtDecode(token);
-      const userId = decodedToken.userId;
+      const userId = decodedToken?.userId;
+      const userIdToUse = userId || storedGoogleUser?._id;
 
-      if (storedGoogleUser) {
-        setUserData(storedGoogleUser);
+      if (!userIdToUse) {
+        console.warn(
+          "No valid user ID found (neither decoded token nor Google User)."
+        );
+        return;
       }
 
-      const googleUserId = storedGoogleUser?._id;
-      console.log("Google User ID:", googleUserId);
+      console.log("Using User ID:", userIdToUse);
 
       const fetchRecipe = async () => {
         try {
-          const response = await axios.get(RECIPEbyUSER_API(userId), {
+          const response = await axios.get(RECIPEbyUSER_API(userIdToUse), {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -52,13 +56,16 @@ export default function Profile() {
           setRecipe(response.data);
           console.log("Recipe Data:", response.data);
         } catch (error) {
-          console.error("Error fetching recipe data:", error);
+          console.error(
+            "Error fetching recipe data:",
+            error?.response?.data || error.message
+          );
         }
       };
 
       const fetchUserData = async () => {
         try {
-          const response = await axios.get(LOGGEDUSER_API(userId), {
+          const response = await axios.get(LOGGEDUSER_API(userIdToUse), {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -66,39 +73,20 @@ export default function Profile() {
           setUserData(response.data);
           console.log("User Data:", response.data);
         } catch (error) {
-          console.error("Error fetching user data:", error);
+          console.error(
+            "Error fetching user data:",
+            error?.response?.data || error.message
+          );
         }
       };
-
       fetchRecipe();
       fetchUserData();
     } catch (error) {
-      console.error("Error decoding token:", error);
+      console.error("Error decoding token:", error.message);
     }
   }, []);
 
-  const timeSince = (date) => {
-    const now = new Date();
-    const seconds = Math.floor((now - new Date(date)) / 1000);
-
-    const intervals = [
-      { label: "year", seconds: 31536000 },
-      { label: "month", seconds: 2592000 },
-      { label: "week", seconds: 604800 },
-      { label: "day", seconds: 86400 },
-      { label: "hour", seconds: 3600 },
-      { label: "minute", seconds: 60 },
-      { label: "second", seconds: 1 },
-    ];
-
-    for (const interval of intervals) {
-      const count = Math.floor(seconds / interval.seconds);
-      if (count >= 1) {
-        return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
-      }
-    }
-    return "Just now";
-  };
+  const handleAddRecipe = () => {};
 
   return (
     <div className="py-28 px-12">
@@ -107,9 +95,9 @@ export default function Profile() {
           <div className="p-16 rounded-full bg-gray-200"></div>
           <div className="flex flex-col justify-center space-y-2">
             <p className="font-bold text-xl">{userData?.name}</p>
-            <button className="bg-gray-200 py-2 px-6 rounded-[5px] self-start">
-              Edit Profile
-            </button>
+            <EditProfileButton
+              className="bg-gray-200 py-2 px-6 rounded-[5px] self-start"
+            />
           </div>
         </div>
         <div className="flex flex-row space-x-20 px-6">
@@ -142,10 +130,7 @@ export default function Profile() {
           </TabsList>
           <TabsContent value="recipes" className="">
             <div className="flex justify-end items-end w-full pb-4">
-              <button className="bg-black text-white py-1 px-4 flex flex-row items-center font-medium text-sm rounded-md">
-                <FaPlus className="mr-2" size={12} />
-                Add Recipe
-              </button>
+              <AddRecipeButton />
             </div>
             <div className="space-y-4">
               {recipe.length > 0 ? (
@@ -153,13 +138,16 @@ export default function Profile() {
                   <div className="w-full border border-gray-200 p-4 rounded-md bg-gray-50">
                     <div className="flex flex-row space-x-2">
                       <div className="p-6 bg-gray-200  rounded-full" />
-                      <div className="flex justify-center flex-col">
-                        <p className="text-sm font-medium">
-                          {recipes.createdBy?.name}
-                        </p>
-                        <p className="text-xs">
-                          {timeSince(recipes.createdOn)}
-                        </p>
+                      <div className="flex justify-between w-full flex-row items-center">
+                        <div>
+                          <p className="text-sm font-medium">
+                            {recipes.createdBy?.name}
+                          </p>
+                          <p className="text-xs">{recipes.timeSince}</p>
+                        </div>
+                        <div>
+                          <FaBookmark />
+                        </div>
                       </div>
                     </div>
                     <div key={recipe._id} className="px-2 py-4">

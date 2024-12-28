@@ -2,56 +2,52 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-const { OAuth2Client } = require('google-auth-library');
+const { OAuth2Client } = require("google-auth-library");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const googleLogin = async (req, res) => {
-  const { token } = req.body;  // The token received from frontend
+  const { token } = req.body;
 
   try {
-    // Verify the Google token
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,  // The Client ID
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
     const { sub, name, email } = payload;
 
-    // Check if the user already exists in the database
     let user = await User.findOne({ googleId: sub });
 
-    // If user doesn't exist, create a new user
     if (!user) {
       user = new User({
-        googleId: sub,  // Store the Google ID for future logins
+        googleId: sub,
         name,
         email,
       });
-
-      // Save the new user to the database
       await user.save();
     }
 
-    // Create a JWT token for the user (whether they were created or found)
-    const jwtToken = jwt.sign({ googleId: sub, name, email }, process.env.JWT_SECRET);
+    const jwtToken = jwt.sign(
+      { googleId: sub, name, email, userId: user._id },
+      process.env.JWT_SECRET
+    );
 
-    // Send the token and user info in the response
     res.json({
       token: jwtToken,
+      userId: user._id,
       name: user.name,
       email: user.email,
-      message: 'Login successful!',
+      message: "Login successful!",
     });
-
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: 'Invalid Google token or error verifying token' });
+    res
+      .status(400)
+      .json({ message: "Invalid Google token or error verifying token" });
   }
 };
-
-
 
 const userSignup = async (req, res) => {
   try {
@@ -94,7 +90,7 @@ const userLogin = async (req, res) => {
 
     const token = jwt.sign(
       { email: user.email, userId: user._id },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET
     );
 
     console.log("Generated token:", token);
@@ -115,8 +111,6 @@ const userLogin = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
-
-
 
 const getAllUsers = async (req, res) => {
   try {
@@ -146,5 +140,38 @@ const getUserLoggedin = async (req, res) => {
   }
 };
 
+const editUsername = async (req, res) => {
+  try {
+    const { userId } = req.params;  // Get user ID from the authenticated user
+    const { name } = req.body;    // Get the new name from the request body
 
-module.exports = { userLogin, userSignup, getUserLoggedin, getAllUsers, googleLogin };
+    // Update the user's name in the database
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name },
+      { new: true }  // Return the updated user
+    );
+
+    // If no user is found, send an error response
+    if (!updatedUser) {
+      return res.status(404).json({ status: 'error', message: 'User not found' });
+    }
+
+    // Send the updated user data as a response
+    res.status(200).json({ status: 'ok', data: updatedUser });
+  } catch (error) {
+    // Handle any errors during the process
+    console.error(error);
+    res.status(500).json({ status: 'error', message: 'Server error' });
+  }
+};
+
+
+module.exports = {
+  userLogin,
+  userSignup,
+  getUserLoggedin,
+  getAllUsers,
+  googleLogin,
+  editUsername,
+};

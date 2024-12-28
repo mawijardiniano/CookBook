@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Input } from "@/components/ui/input";
-import { FaBell, FaComment, FaHeart, FaShare } from "react-icons/fa";
+import { FaBell, FaBookmark, FaComment, FaHeart, FaShare } from "react-icons/fa";
 import "../App.css";
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -25,6 +25,7 @@ export default function Home() {
     getRecipes();
   }, []);
 
+
   return (
     <div className="flex-1 flex flex-col w-full py-20 px-10">
       <div className="px-6">
@@ -37,9 +38,15 @@ export default function Home() {
               >
                 <div className="flex flex-row space-x-2 items-center">
                   <div className="p-6 rounded-full bg-gray-200" />
-                  <div className="">
-                    <p className="text-sm font-medium">{account}</p>
-                    <p className="text-[12px]">{time}</p>
+                  <div className="flex flex-row items-center justify-between w-full">
+                  <div>
+                  <p className="text-sm font-medium">{recipe.createdBy?.name || "Null"}</p>
+                  <p className="text-[12px]">{recipe.timeSince}</p>
+                  </div>
+                  <div>
+                  <FaBookmark/>
+                  </div>
+
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold">{recipe.title}</h3>
