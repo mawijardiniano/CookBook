@@ -86,6 +86,7 @@ export default function Profile() {
     }
   }, []);
 
+  const handleAddRecipe = () => {};
 
   return (
     <div className="py-28 px-12">
