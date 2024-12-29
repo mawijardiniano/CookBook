@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo } from "react";
+import React, { useState, useEffect,useCallback, memo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +10,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const MemoizedDialogHeader = memo(() => (
   <DialogHeader>
@@ -47,14 +50,90 @@ const MemoizedInput = memo(({ value, onChange, placeholder, className }) => {
 
 const EditProfileButton = () => {
   const [name, setName] = useState("");
+  const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
+  const EDITUSER_API = (id) => `http://localhost:5000/api/user/edit/${id}`
+  const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
 
   const handleNameChange = useCallback((value) => {
     setName(value);
   }, []);
 
-  const handleSave = useCallback(() => {
-    console.log("Profile saved:", name);
-  }, [name]);
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    console.log("Retrieved Token:", token);
+
+    const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
+    console.log("Retrieved Google User:", storedGoogleUser);
+
+    if (!token) {
+      console.log("No token found");
+      return;
+    }
+
+    try {
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken?.userId;
+      const userIdToUse = userId || storedGoogleUser?._id;
+
+      if (!userIdToUse) {
+        console.warn(
+          "No valid user ID found (neither decoded token nor Google User)."
+        );
+        return;
+      }
+
+      console.log("Using User ID:", userIdToUse);
+
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get(LOGGEDUSER_API(userIdToUse), {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUserData(response.data);
+          console.log("User Data:", response.data);
+        } catch (error) {
+          console.error(
+            "Error fetching user data:",
+            error?.response?.data || error.message
+          );
+        }
+      };
+      fetchUserData();
+    } catch (error) {
+      console.error("Error decoding token:", error.message);
+    }
+  }, []);
+
+  const handleSave = async () => {
+     const token = localStorage.getItem("authToken");
+        console.log("Retrieved Token:", token);
+    
+        const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
+        console.log("Retrieved Google User:", storedGoogleUser);
+    
+        if (!token) {
+          console.log("No token found");
+          return;
+        }
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken?.userId;
+        const userIdToUse = userId || storedGoogleUser?._id;
+        console.log("User ID to use:", userIdToUse);
+        try {
+          const response = await axios.put(EDITUSER_API(userIdToUse), {
+            name: name, 
+          });
+          console.log("New username", response);
+          setUserData({ ...userData, name: response.data.name });
+          navigate("/profile");
+          window.location.reload(); 
+        } catch (error) {
+          
+        }
+  }
 
   return (
     <Dialog>
