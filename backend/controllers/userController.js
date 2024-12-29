@@ -142,25 +142,21 @@ const getUserLoggedin = async (req, res) => {
 
 const editUsername = async (req, res) => {
   try {
-    const { userId } = req.params;  // Get user ID from the authenticated user
-    const { name } = req.body;    // Get the new name from the request body
+    const { userId } = req.params; 
+    const { name } = req.body;
 
-    // Update the user's name in the database
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { name },
-      { new: true }  // Return the updated user
+      { new: true } 
     );
 
-    // If no user is found, send an error response
     if (!updatedUser) {
       return res.status(404).json({ status: 'error', message: 'User not found' });
     }
 
-    // Send the updated user data as a response
     res.status(200).json({ status: 'ok', data: updatedUser });
   } catch (error) {
-    // Handle any errors during the process
     console.error(error);
     res.status(500).json({ status: 'error', message: 'Server error' });
   }

@@ -10,6 +10,10 @@ const Navbar = () => {
 
   const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
 
+  const handleSearchChange = (e) => {
+    setQuery(e.target.value);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     console.log("Retrieved Token:", token);
@@ -66,9 +70,9 @@ const Navbar = () => {
           <Input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleSearchChange}
             placeholder="Search..."
-            className="border focus:border-black focus:outline-none border-slate-200 "
+            className="border focus:border-black focus:outline-none border-slate-200"
           />
         </div>
 

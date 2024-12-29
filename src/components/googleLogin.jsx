@@ -1,4 +1,4 @@
-// GoogleLoginButton.js
+
 import React from 'react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 

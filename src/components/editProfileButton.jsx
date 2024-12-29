@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState, useCallback, memo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,16 +10,52 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { FaBookmark, FaPlus } from "react-icons/fa";
+
+const MemoizedDialogHeader = memo(() => (
+  <DialogHeader>
+    <DialogTitle>Edit profile</DialogTitle>
+    <DialogDescription>
+      Make changes to your profile here. Click save when you're done.
+    </DialogDescription>
+  </DialogHeader>
+));
+
+const MemoizedDialogFooter = memo(({ onSave }) => (
+  <DialogFooter>
+    <Button
+      type="submit"
+      className="py-2 px-6 rounded-[5px] self-start text-white"
+      style={{ backgroundColor: "black" }}
+      onClick={onSave}
+    >
+      Save changes
+    </Button>
+  </DialogFooter>
+));
+
+const MemoizedInput = memo(({ value, onChange, placeholder, className }) => {
+  console.log("Input Re-rendered");
+  return (
+    <Input
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      className={className}
+    />
+  );
+});
 
 const EditProfileButton = () => {
   const [name, setName] = useState("");
 
-  const handleNameChange = (value) => {
+  const handleNameChange = useCallback((value) => {
     setName(value);
-  };
-  
+  }, []);
+
+  const handleSave = useCallback(() => {
+    console.log("Profile saved:", name);
+  }, [name]);
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -28,20 +64,18 @@ const EditProfileButton = () => {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-white">
-        <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
-          </DialogDescription>
-        </DialogHeader>
+        <MemoizedDialogHeader />
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Input placeholder="Name" id="name" value={name} onChange={(e) => handleNameChange(e.target.value)} className="col-span-3" />
+            <MemoizedInput
+              placeholder="Name"
+              value={name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              className="col-span-3"
+            />
           </div>
         </div>
-        <DialogFooter >
-          <Button type="submit" className=" py-2 px-6 rounded-[5px] self-start text-white" style={{ backgroundColor: 'black' }}>Save changes</Button>
-        </DialogFooter>
+        <MemoizedDialogFooter onSave={handleSave} />
       </DialogContent>
     </Dialog>
   );
