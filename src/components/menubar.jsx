@@ -1,19 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { FaBell, FaComment, FaBookReader } from "react-icons/fa";
+import {
+  Menubar,
+  MenubarCheckboxItem,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarRadioGroup,
+  MenubarRadioItem,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { NameMenubar } from "./menubar";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-const Navbar = () => {
-  const [query, setQuery] = useState("");
+export function NameMenubar() {
   const [userData, setUserData] = useState(null);
-
+  const navigate = useNavigate();
   const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
-
-  const handleSearchChange = (e) => {
-    setQuery(e.target.value);
-  };
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -58,33 +66,29 @@ const Navbar = () => {
     }
   }, []);
 
+  const navigateToProfile = () => {
+    navigate("/profile")
+  }
+
+  const handleLogout = () => {
+
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("googleUser");
+
+    navigate("/");
+  };
+
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white shadow px-6 py-4 z-50 flex flex-row justify-between">
-      <div className="flex items-center space-x-3">
-        <h1 className="text-2xl font-bold flex items-center space-x-2">
-          <FaBookReader className="text-black" />
-          <span className="text-black">CookBook</span>
-        </h1>
-      </div>
-      <div className="flex items-center justify-end space-x-6">
-        <div>
-          <Input
-            type="text"
-            value={query}
-            onChange={handleSearchChange}
-            placeholder="Search..."
-            className="border focus:border-black focus:outline-none border-slate-200"
-          />
-        </div>
-
-        <div className="flex items-center space-x-6">
-          <FaBell className="text-gray-500 hover:text-gray-700" size={24} />
-          <FaComment className="text-gray-500 hover:text-gray-700" size={24} />
-          <NameMenubar/>
-        </div>
-      </div>
-    </nav>
+    <Menubar>
+      <MenubarMenu>
+        <MenubarTrigger>{userData?.name}</MenubarTrigger>
+        <MenubarContent>
+          <MenubarItem onClick={navigateToProfile}>My Profile</MenubarItem>
+          <MenubarSeparator />
+          <MenubarItem onClick={handleLogout}>Logout</MenubarItem>
+          <MenubarSeparator />
+        </MenubarContent>
+      </MenubarMenu>
+    </Menubar>
   );
-};
-
-export default Navbar;
+}

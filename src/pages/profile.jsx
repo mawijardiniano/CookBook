@@ -2,7 +2,7 @@ import React, { useState, useEffect, memo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { FaBookmark, FaPlus } from "react-icons/fa";
+import { FaBookmark,  FaEllipsisH  } from "react-icons/fa";
 import AddRecipeButton from "../components/addRecipeButton";
 import EditProfileButton from "../components/editProfileButton";
 
@@ -38,13 +38,14 @@ export default function Profile() {
             <div className="w-full border border-gray-200 p-4 rounded-md bg-gray-50" key={recipe._id}>
               <div className="flex flex-row space-x-2">
                 <div className="p-6 bg-gray-200  rounded-full" />
-                <div className="flex justify-between w-full flex-row items-center">
+                <div className="flex justify-between w-full flex-row">
                   <div>
                     <p className="text-sm font-medium">{recipe.createdBy?.name}</p>
                     <p className="text-xs">{recipe.timeSince}</p>
                   </div>
-                  <div>
+                  <div className="flex flex-row space-x-2">
                     <FaBookmark />
+                    <FaEllipsisH className="text-gray-500"/>
                   </div>
                 </div>
               </div>

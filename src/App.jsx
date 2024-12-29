@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { scan } from 'react-scan';
+import React, { useEffect } from "react";
+import { scan } from "react-scan";
 import { Routes, Route, BrowserRouter, useLocation } from "react-router-dom";
 import Landing from "./pages/landing";
 import Signup from "./pages/signup";
@@ -10,15 +10,17 @@ import Profile from "./pages/profile";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Navbar from "./components/navbar";
+import PrivateRoute from "./pages/PrivateRoute";
 
 function MainApp() {
-  const location = useLocation(); 
-  const hideSidebar = location.pathname === "/" || location.pathname === "/signup";
+  const location = useLocation();
+  const hideSidebar =
+    location.pathname === "/" || location.pathname === "/signup";
 
   useEffect(() => {
     scan({
-      enabled: true, // Make sure it's enabled
-      log: true, // Logs performance data to the console
+      enabled: true,
+      log: true,
       highlight: true,
     });
   }, []);
@@ -32,10 +34,38 @@ function MainApp() {
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/savedRecipes" element={<SavedRecipes />} />
-              <Route path="/following" element={<Following />} />
-              <Route path="/profile" element={<Profile />} />
+              <Route
+                path="/home"
+                element={
+                  <PrivateRoute>
+                    <Home />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/savedRecipes"
+                element={
+                  <PrivateRoute>
+                    <SavedRecipes />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/following"
+                element={
+                  <PrivateRoute>
+                    <Following />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                }
+              />
             </Routes>
           </div>
         </div>
