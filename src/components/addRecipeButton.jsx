@@ -198,7 +198,7 @@ const AddRecipeButton = () => {
             </div>
 
             <DialogFooter>
-              <Button type="submit">Save Recipe</Button>
+              <Button style={{ backgroundColor: "black" }} className="text-white font-normal" type="submit">Save Recipe</Button>
             </DialogFooter>
           </div>
         </form>

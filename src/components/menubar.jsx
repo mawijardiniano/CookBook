@@ -82,7 +82,7 @@ export function NameMenubar() {
     <Menubar>
       <MenubarMenu>
         <MenubarTrigger>{userData?.name}</MenubarTrigger>
-        <MenubarContent>
+        <MenubarContent >
           <MenubarItem onClick={navigateToProfile}>My Profile</MenubarItem>
           <MenubarSeparator />
           <MenubarItem onClick={handleLogout}>Logout</MenubarItem>

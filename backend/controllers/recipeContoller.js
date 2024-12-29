@@ -77,4 +77,14 @@ const getRecipes = async (req, res) => {
   }
 };
 
-module.exports = { createRecipe, getRecipes,getRecipeByUser };
+const deleteRecipe = async (req, res) => {
+  try {
+    const {id} = req.params
+    const recipe = await Recipe.findByIdAndDelete(id)
+    res.json(recipe);
+  } catch (error) {
+    
+  }
+}
+
+module.exports = { createRecipe, getRecipes,getRecipeByUser,deleteRecipe };

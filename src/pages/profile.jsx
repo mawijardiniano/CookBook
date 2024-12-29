@@ -2,9 +2,10 @@ import React, { useState, useEffect, memo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { FaBookmark,  FaEllipsisH  } from "react-icons/fa";
+import { FaBookmark, FaEllipsisH } from "react-icons/fa";
 import AddRecipeButton from "../components/addRecipeButton";
 import EditProfileButton from "../components/editProfileButton";
+import { RecipesMenubar } from "../components/recipesMenubar";
 
 export default function Profile() {
   const [date, setDate] = useState(new Date());
@@ -35,17 +36,23 @@ export default function Profile() {
       <div className="space-y-4">
         {recipes.length > 0 ? (
           recipes.map((recipe) => (
-            <div className="w-full border border-gray-200 p-4 rounded-md bg-gray-50" key={recipe._id}>
+            <div
+              className="w-full border border-gray-200 p-4 rounded-md bg-gray-50"
+              key={recipe._id}
+            >
               <div className="flex flex-row space-x-2">
                 <div className="p-6 bg-gray-200  rounded-full" />
                 <div className="flex justify-between w-full flex-row">
                   <div>
-                    <p className="text-sm font-medium">{recipe.createdBy?.name}</p>
+                    <p className="text-sm font-medium">
+                      {recipe.createdBy?.name}
+                    </p>
                     <p className="text-xs">{recipe.timeSince}</p>
                   </div>
-                  <div className="flex flex-row space-x-2">
+                  <div className="flex flex-row space-x-2 items-center">
                     <FaBookmark />
-                    <FaEllipsisH className="text-gray-500"/>
+                    <RecipesMenubar recipeId={recipe._id} />
+
                   </div>
                 </div>
               </div>
@@ -139,8 +146,11 @@ export default function Profile() {
     }
   }, []);
 
-  const sortedRecipes = [...recipe]
-    .sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+  const sortedRecipes = [...recipe].sort(
+    (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
+  );
+
+
 
   return (
     <div className="py-28 px-12">
@@ -158,13 +168,22 @@ export default function Profile() {
       <div className="px-6 py-10">
         <Tabs defaultValue="recipes" className="w-full">
           <TabsList className="flex w-full">
-            <TabsTrigger value="recipes" className="flex-1 text-center bg-gray-100 p-2">
+            <TabsTrigger
+              value="recipes"
+              className="flex-1 text-center bg-gray-100 p-2"
+            >
               Recipes
             </TabsTrigger>
-            <TabsTrigger value="saved" className="flex-1 text-center bg-gray-100 p-2">
+            <TabsTrigger
+              value="saved"
+              className="flex-1 text-center bg-gray-100 p-2"
+            >
               Saved Recipes
             </TabsTrigger>
-            <TabsTrigger value="likes" className="flex-1 text-center bg-gray-100 p-2">
+            <TabsTrigger
+              value="likes"
+              className="flex-1 text-center bg-gray-100 p-2"
+            >
               Likes
             </TabsTrigger>
           </TabsList>
