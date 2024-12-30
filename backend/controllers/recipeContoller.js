@@ -25,7 +25,7 @@ const timeSince = (date) => {
 };
 
 const createRecipe = async (req, res) => {
-  const { title, description, ingredients, instructions } = req.body;
+  const { title, description, ingredients, instructions, tags } = req.body;
   const userId = req.params.id;
   try {
     const recipe = new Recipe({
@@ -33,6 +33,7 @@ const createRecipe = async (req, res) => {
       description,
       ingredients,
       instructions,
+      tags,
       createdBy: userId,
     });
 

@@ -71,6 +71,38 @@ const MemoizedRecipeCard = memo(
           </div>
           <h3 className="text-xl font-semibold">{recipe.title}</h3>
           <p>{recipe.description}</p>
+          <div>
+                <h3 className="text-md font-medium">Ingredients</h3>
+                <ul className="text-sm">
+                  {Array.isArray(recipe.ingredients) &&
+                    recipe.ingredients.map((ingredient, index) => (
+                      <li key={index}>
+                        {ingredient.name}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-medium text-md">Instructions</h3>
+                <ol>
+                  {Array.isArray(recipe.instructions) &&
+                    recipe.instructions.map((instruction, index) => (
+                      <li key={index} className="text-sm">
+                        Step {index + 1}: {instruction.name}
+                      </li>
+                    ))}
+                </ol>
+              </div>
+              <div>
+              <ol className="flex flex-row space-x-2 py-2">
+                  {Array.isArray(recipe.tags) &&
+                    recipe.tags.map((tags, index) => (
+                      <li key={index} className="text-[10px] font-medium bg-gray-200 px-2 rounded-md">
+                        {tags}
+                      </li>
+                    ))}
+                </ol>
+              </div>
           <div className="flex flex-row items-center space-x-1">
             <MemoizedLikes likes={recipe.likes.length} />
           </div>

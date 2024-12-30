@@ -44,7 +44,10 @@ const MemoizedLikedRecipes = memo(({ userData }) => (
     {userData ? (
       userData.likedRecipes && userData.likedRecipes.length > 0 ? (
         userData.likedRecipes.map((recipe) => (
-          <div key={recipe._id} className="mb-4 bg-gray-100 p-4 border border-gray-200 rounded-md">
+          <div
+            key={recipe._id}
+            className="mb-4 bg-gray-100 p-4 border border-gray-200 rounded-md"
+          >
             <div className="flex flex-row space-x-2">
               <div className="p-6 bg-gray-200 rounded-full" />
               <div className="flex justify-between w-full flex-row">
@@ -78,8 +81,10 @@ const MemoizedSavedRecipes = memo(({ userData }) => (
     {userData ? (
       userData.savedRecipes && userData.savedRecipes.length > 0 ? (
         userData.savedRecipes.map((recipe) => (
-          <div key={recipe._id} className="mb-4 bg-gray-100 p-4 border border-gray-200 rounded-md">
-  
+          <div
+            key={recipe._id}
+            className="mb-4 bg-gray-100 p-4 border border-gray-200 rounded-md"
+          >
             <div className="flex flex-row space-x-2">
               <div className="p-6 bg-gray-200 rounded-full" />
               <div className="flex justify-between w-full flex-row">
@@ -109,7 +114,6 @@ const MemoizedSavedRecipes = memo(({ userData }) => (
   </div>
 ));
 
-
 const MemoizedRecipeLists = memo(({ recipes }) => (
   <TabsContent value="recipes" className="">
     <div className="flex justify-end items-end w-full pb-4">
@@ -123,13 +127,13 @@ const MemoizedRecipeLists = memo(({ recipes }) => (
             key={recipe._id}
           >
             <div className="flex flex-row space-x-2">
-              <div className="p-6 bg-gray-200  rounded-full" />
+              <div className="p-6 bg-gray-200 rounded-full" />
               <div className="flex justify-between w-full flex-row">
                 <div>
                   <p className="text-sm font-medium">
-                    {recipe.createdBy?.name}
+                    {recipe.createdBy?.name || "Unknown"}
                   </p>
-                  <p className="text-xs">{recipe.timeSince}</p>
+                  <p className="text-xs">{timeSince(recipe?.createdOn)}</p>
                 </div>
                 <div className="flex flex-row space-x-2 items-center">
                   <FaBookmark />
@@ -142,20 +146,34 @@ const MemoizedRecipeLists = memo(({ recipes }) => (
               <p className="text-sm">{recipe.description}</p>
               <div>
                 <h3 className="text-md font-medium">Ingredients</h3>
-                <p className="text-sm">
-                  {recipe.ingredients.map((ingredient, index) => (
-                    <li key={index}>{ingredient}</li>
-                  ))}
-                </p>
+                <ul className="text-sm">
+                  {Array.isArray(recipe.ingredients) &&
+                    recipe.ingredients.map((ingredient, index) => (
+                      <li key={index}>
+                        {ingredient.name}
+                      </li>
+                    ))}
+                </ul>
               </div>
               <div>
                 <h3 className="font-medium text-md">Instructions</h3>
                 <ol>
-                  {recipe.instructions.map((instruction, index) => (
-                    <li key={index} className="text-sm">
-                      Step {index + 1}: {instruction}
-                    </li>
-                  ))}
+                  {Array.isArray(recipe.instructions) &&
+                    recipe.instructions.map((instruction, index) => (
+                      <li key={index} className="text-sm">
+                        Step {index + 1}: {instruction.name}
+                      </li>
+                    ))}
+                </ol>
+              </div>
+              <div>
+              <ol className="flex flex-row space-x-2 pt-2">
+                  {Array.isArray(recipe.tags) &&
+                    recipe.tags.map((tags, index) => (
+                      <li key={index} className="text-[10px] font-medium bg-gray-200 px-2 rounded-md">
+                        {tags}
+                      </li>
+                    ))}
                 </ol>
               </div>
             </div>
@@ -168,6 +186,7 @@ const MemoizedRecipeLists = memo(({ recipes }) => (
     </div>
   </TabsContent>
 ));
+
 
 export default function Profile() {
   const [date, setDate] = useState(new Date());

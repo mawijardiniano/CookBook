@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const recipeSchema = new mongoose.Schema({
   title: {
@@ -9,52 +9,54 @@ const recipeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  ingredients: [{
-    type: String,
-    required: true,
-  }],
-  instructions: [{
-    type: String,
-    required: true,
-  }],
+  ingredients: [
+    {
+      name: { type: String, required: true },
+    }
+  ],
+  instructions: [
+    {
+      step: { type: String, required: true },
+    }
+  ],
+  tags: [{ type: String }],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   createdOn: {
     type: Date,
     default: Date.now,
   },
-  likes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: [],
-  }],
-  comments: [{
-    user: {
+  likes: [
+    {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
+      ref: "User",
+      default: [],
     },
-    text: {
-      type: String,
-      required: true,
+  ],
+  comments: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      text: {
+        type: String,
+        required: true,
+      },
+      createdOn: {
+        type: Date,
+        default: Date.now,
+      },
     },
-    createdOn: {
-      type: Date,
-      default: Date.now,
-    }
-  }],
+  ],
   shares: {
     type: Number,
     default: 0,
   },
-  likes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: [],
-  }],
 });
 
-module.exports = mongoose.model('Recipe', recipeSchema);
+module.exports = mongoose.model("Recipe", recipeSchema);
