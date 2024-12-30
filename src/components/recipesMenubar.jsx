@@ -100,8 +100,8 @@ import {
           <MenubarTrigger>
             <FaEllipsisH className="text-gray-500" />
           </MenubarTrigger>
-          <MenubarContent className="bg-red-600 text-white border-b-0">
-            <MenubarItem onClick={() => handleDeleteRecipe(recipeId)}>Delete</MenubarItem>
+          <MenubarContent className=" text-white border-b-0 hover:bg-red-600" style={{backgroundColor: "red"}}>
+            <MenubarItem onClick={() => handleDeleteRecipe(recipeId)} style={{backgroundColor: "red"}}>Delete</MenubarItem>
           </MenubarContent>
         </MenubarMenu>
       </Menubar>

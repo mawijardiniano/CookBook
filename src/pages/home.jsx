@@ -1,12 +1,32 @@
 import React, { useState, useEffect, memo, useMemo } from "react";
 import axios from "axios";
-import { FaBell, FaBookmark, FaComment, FaHeart, FaRegHeart, FaShare } from "react-icons/fa";
+import { jwtDecode } from "jwt-decode"; // Don't forget to import jwtDecode if you're using it
+import {
+  FaBell,
+  FaBookmark,
+  FaComment,
+  FaHeart,
+  FaRegHeart,
+  FaShare,
+} from "react-icons/fa";
 import "../App.css";
 
 const RecipeAPI = "http://localhost:5000/api/recipe/create-recipe";
 const GetRecipeAPI = "http://localhost:5000/api/recipe/get-recipe";
+const LikeRecipeAPI = (id) => `http://localhost:5000/api/recipe/like-recipe/${id}`;
+const UnLikeRecipeAPI = (id) => `http://localhost:5000/api/recipe/unlike-recipe/${id}`; // Corrected endpoint
+const LOGGEDUSER_API = (userId) => `http://localhost:5000/api/user/user/${userId}`;
 
-const MemoizedRecipe = memo(({ recipes }) => {
+const MemoizedLikes = memo(({ likes }) => {
+  return (
+    <>
+      <FaHeart size={16} color="red" />
+      <p className="text-sm">{likes}</p>
+    </>
+  );
+});
+
+const MemoizedRecipe = memo(({ recipes, handleLikeRecipe, isLiked }) => {
   return (
     <div className="mt-4">
       {recipes.length > 0 ? (
@@ -31,15 +51,19 @@ const MemoizedRecipe = memo(({ recipes }) => {
             </div>
             <h3 className="text-xl font-semibold">{recipe.title}</h3>
             <p>{recipe.description}</p>
-            <div className="flex flex-row items-center space-x-1  ">
-            <FaHeart size={16} color="red"/>
-              <p className="text-sm">{recipe.likes.length}</p>
+            <div className="flex flex-row items-center space-x-1">
+              <MemoizedLikes likes={recipe.likes.length} />
             </div>
             <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
               <div className="flex flex-row space-x-2 items-center">
-                <FaRegHeart  size={20} />
+                {isLiked[recipe._id] ? (
+                  <FaHeart onClick={() => handleLikeRecipe(recipe._id)} size={20} />
+                ) : (
+                  <FaRegHeart onClick={() => handleLikeRecipe(recipe._id)} size={20} />
+                )}
                 <p className="text-sm">Like</p>
               </div>
+
               <div className="flex flex-row space-x-2 items-center">
                 <FaComment size={20} />
                 <p className="text-sm">Comment</p>
@@ -60,8 +84,11 @@ const MemoizedRecipe = memo(({ recipes }) => {
 });
 
 const Home = () => {
-  const [recipe, setRecipes] = useState([]);
-  
+  const [recipes, setRecipes] = useState([]);
+  const [userData, setUserData] = useState(null);
+  const [userIdToUse, setUserIdToUse] = useState(null);
+  const [isLiked, setIsLiked] = useState({});
+
   const getRecipes = async () => {
     try {
       const response = await axios.get(GetRecipeAPI);
@@ -75,14 +102,71 @@ const Home = () => {
     getRecipes();
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
+    try {
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken?.userId;
+      const userIdToUse = userId || storedGoogleUser?._id;
+
+      if (!userIdToUse) {
+        console.warn("No valid user ID found (neither decoded token nor Google User).");
+        return;
+      }
+      setUserIdToUse(userIdToUse); // Store userIdToUse in state
+
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get(LOGGEDUSER_API(userIdToUse), {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUserData(response.data);
+        } catch (error) {
+          console.error("Error fetching user data:", error?.response?.data || error.message);
+        }
+      };
+      fetchUserData();
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
+  }, []);
+
   const sortedRecipes = useMemo(() => {
-    return [...recipe].sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
-  }, [recipe]);
+    return [...recipes].sort(
+      (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
+    );
+  }, [recipes]);
+
+  const handleLikeRecipe = async (id) => {
+    if (!userIdToUse) {
+      console.error("No user ID found.");
+      return;
+    }
+
+    try {
+      const response = isLiked[id]
+        ? await axios.put(UnLikeRecipeAPI(id), { userId: userIdToUse })
+        : await axios.put(LikeRecipeAPI(id), { userId: userIdToUse });
+
+      if (response.status === 200) {
+        setIsLiked((prevState) => ({
+          ...prevState,
+          [id]: !prevState[id],
+        }));
+        getRecipes();
+      }
+    } catch (error) {
+      console.error("Error handling like/unlike recipe:", error);
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col w-full py-20 px-10">
       <div className="px-6">
-        <MemoizedRecipe recipes={sortedRecipes} />
+        <MemoizedRecipe recipes={sortedRecipes} handleLikeRecipe={handleLikeRecipe} isLiked={isLiked} />
       </div>
     </div>
   );

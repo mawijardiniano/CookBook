@@ -102,4 +102,28 @@ const likeRecipe = async (req, res) => {
   } catch (error) {}
 };
 
-module.exports = { createRecipe, getRecipes, getRecipeByUser, deleteRecipe,likeRecipe };
+const unlikeRecipe = async (req, res) => {
+  const { id } = req.params;
+  const {userId} = req.body;
+  try {
+    const updatedRecipe = await Recipe.findOneAndUpdate(
+      { 
+        _id :id }, 
+      {
+        $pull: { likes: userId },
+      },
+      { new: true } 
+    );
+
+    if (!updatedRecipe) {
+      return res.status(404).json({ message: 'Recipe not found or already liked' });
+    }
+
+    res.status(200).json(updatedRecipe);
+  } catch (error) {}
+};
+
+
+
+
+module.exports = { createRecipe, getRecipes, getRecipeByUser, deleteRecipe,likeRecipe,unlikeRecipe };
