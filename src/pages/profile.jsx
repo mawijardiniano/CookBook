@@ -16,12 +16,51 @@ const MemoizedUsername = memo(({ name }) => {
   );
 });
 
+const timeSince = (date) => {
+  const now = new Date();
+  const seconds = Math.floor((now - new Date(date)) / 1000);
+
+  const intervals = [
+    { label: "year", seconds: 31536000 },
+    { label: "month", seconds: 2592000 },
+    { label: "week", seconds: 604800 },
+    { label: "day", seconds: 86400 },
+    { label: "hour", seconds: 3600 },
+    { label: "minute", seconds: 60 },
+    { label: "second", seconds: 1 },
+  ];
+
+  for (const interval of intervals) {
+    const count = Math.floor(seconds / interval.seconds);
+    if (count >= 1) {
+      return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
+    }
+  }
+  return "Just now";
+};
+
 const MemoizedLikedRecipes = memo(({ userData }) => (
-  <div>
+  <div className="bg-gray-100 p-4">
     {userData ? (
       userData.likedRecipes && userData.likedRecipes.length > 0 ? (
         userData.likedRecipes.map((recipe) => (
           <div key={recipe._id}>
+            <div className="flex flex-row space-x-2">
+              <div className="p-6 bg-gray-200 rounded-full" />
+              <div className="flex justify-between w-full flex-row">
+                <div className="flex justify-center flex-col">
+                  <p className="text-sm font-medium">
+                    {typeof recipe.createdBy === "string"
+                      ? recipe.createdBy
+                      : recipe.createdBy?.name || "Unknown"}
+                  </p>
+                  <p className="text-xs">{timeSince(recipe?.createdOn)}</p>
+                </div>
+                <div className="flex flex-row space-x-2 items-center">
+                  <FaBookmark />
+                </div>
+              </div>
+            </div>
             <h3>{recipe.title}</h3>
             <p>{recipe.description}</p>
           </div>
@@ -211,7 +250,7 @@ export default function Profile() {
           <TabsContent value="saved" className="p-4">
             Show saved recipes
           </TabsContent>
-          <TabsContent value="likes" className="p-4">
+          <TabsContent value="likes">
     <MemoizedLikedRecipes userData={userData}/>
           </TabsContent>
         </Tabs>

@@ -122,8 +122,14 @@ const getAllUsers = async (req, res) => {
 const getUserLoggedin = async (req, res) => {
   try {
     const { userId } = req.user;
-
-    const user = await User.findById(userId).populate("likedRecipes");
+    const user = await User.findById(userId)
+  .populate({
+    path: "likedRecipes",
+    populate: {
+      path: "createdBy",
+      model: "User",
+    },
+  });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

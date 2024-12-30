@@ -19,6 +19,10 @@ const UnLikeRecipeAPI = (id) =>
   `http://localhost:5000/api/recipe/unlike-recipe/${id}`;
 const LOGGEDUSER_API = (userId) =>
   `http://localhost:5000/api/user/user/${userId}`;
+const saveRecipeAPI = (id) =>
+  `http://localhost:5000/api/recipe/save-recipe/${id}`;
+const UnSAveRecipeAPI = (id) =>
+  `http://localhost:5000/api/recipe/unsave-recipe/${id}`;
 
 const MemoizedLikes = memo(({ likes }) => {
   return (
@@ -115,6 +119,7 @@ const Home = () => {
   const [userData, setUserData] = useState(null);
   const [userIdToUse, setUserIdToUse] = useState(null);
   const [isLiked, setIsLiked] = useState({});
+  const [isSaved, setIsSaved] = useState({});
 
   const getRecipes = async () => {
     try {
@@ -201,6 +206,37 @@ const Home = () => {
 
     getRecipes();
   }, []);
+
+  const handleLikeRecipe = async (id) => {
+    if (!userIdToUse) {
+      console.error("No user ID found.");
+      return;
+    }
+
+    try {
+      const response = isLiked[id]
+        ? await axios.put(UnLikeRecipeAPI(id), { userId: userIdToUse })
+        : await axios.put(LikeRecipeAPI(id), { userId: userIdToUse });
+
+      if (response.status === 200) {
+        const updatedIsLiked = { ...isLiked, [id]: !isLiked[id] };
+        localStorage.setItem("isLiked", JSON.stringify(updatedIsLiked));
+
+        setIsLiked(updatedIsLiked);
+
+        getRecipes();
+      }
+    } catch (error) {
+      console.error("Error handling like/unlike recipe:", error);
+    }
+  };
+  useEffect(() => {
+    const storedIsLiked = JSON.parse(localStorage.getItem("isLiked")) || {};
+    setIsLiked(storedIsLiked);
+
+    getRecipes();
+  }, []);
+
 
   return (
     <div className="flex-1 flex flex-col w-full py-20 px-10">

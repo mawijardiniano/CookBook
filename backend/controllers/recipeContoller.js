@@ -143,5 +143,65 @@ const unlikeRecipe = async (req, res) => {
 };
 
 
+const saveRecipe = async (req, res) => {
+  const { id } = req.params;
+  const {userId} = req.body;
+  try {
+    const updatedRecipe = await Recipe.findOneAndUpdate(
+      { _id: id, saved: { $ne: userId } }, 
+      {
+        $addToSet: { saved: userId },
+      },
+      { new: true } 
+    );
 
-module.exports = { createRecipe, getRecipes, getRecipeByUser, deleteRecipe,likeRecipe,unlikeRecipe };
+    if (!updatedRecipe) {
+      return res.status(404).json({ message: 'Recipe not found or already liked' });
+    }
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { savedRecipes: id } },
+      { new: true } 
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(updatedRecipe);
+  } catch (error) {}
+};
+
+const unSaveRecipe = async (req, res) => {
+  const { id } = req.params;
+  const {userId} = req.body;
+  try {
+    const updatedRecipe = await Recipe.findOneAndUpdate(
+      { 
+        _id :id }, 
+      {
+        $pull: { saved: userId },
+      },
+      { new: true } 
+    );
+
+    if (!updatedRecipe) {
+      return res.status(404).json({ message: 'Recipe not found or already liked' });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { savedRecipes: id } },
+      { new: true } 
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(updatedRecipe);
+  } catch (error) {}
+};
+
+
+module.exports = { createRecipe, getRecipes, getRecipeByUser, deleteRecipe,likeRecipe,unlikeRecipe, saveRecipe, unSaveRecipe };

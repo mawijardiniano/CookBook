@@ -49,6 +49,11 @@ const recipeSchema = new mongoose.Schema({
   shares: {
     type: Number,
     default: 0,
+  },
+  saved: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: [],
   }
 });
 
