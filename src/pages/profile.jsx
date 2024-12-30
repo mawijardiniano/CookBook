@@ -7,6 +7,74 @@ import AddRecipeButton from "../components/addRecipeButton";
 import EditProfileButton from "../components/editProfileButton";
 import { RecipesMenubar } from "../components/recipesMenubar";
 
+const MemoizedUsername = memo(({ name }) => {
+  return (
+    <div className="flex flex-col justify-center space-y-2">
+      <p className="font-bold text-xl">{name}</p>
+      <EditProfileButton className="bg-gray-200 py-2 px-6 rounded-[5px] self-start" />
+    </div>
+  );
+});
+
+const MemoizedRecipeLists = memo(({ recipes }) => (
+  <TabsContent value="recipes" className="">
+    <div className="flex justify-end items-end w-full pb-4">
+      <AddRecipeButton />
+    </div>
+    <div className="space-y-4">
+      {recipes.length > 0 ? (
+        recipes.map((recipe) => (
+          <div
+            className="w-full border border-gray-200 p-4 rounded-md bg-gray-50"
+            key={recipe._id}
+          >
+            <div className="flex flex-row space-x-2">
+              <div className="p-6 bg-gray-200  rounded-full" />
+              <div className="flex justify-between w-full flex-row">
+                <div>
+                  <p className="text-sm font-medium">
+                    {recipe.createdBy?.name}
+                  </p>
+                  <p className="text-xs">{recipe.timeSince}</p>
+                </div>
+                <div className="flex flex-row space-x-2 items-center">
+                  <FaBookmark />
+                  <RecipesMenubar recipeId={recipe._id} />
+                </div>
+              </div>
+            </div>
+            <div className="px-2 py-4">
+              <p className="text-lg font-medium">{recipe.title}</p>
+              <p className="text-sm">{recipe.description}</p>
+              <div>
+                <h3 className="text-md font-medium">Ingredients</h3>
+                <p className="text-sm">
+                  {recipe.ingredients.map((ingredient, index) => (
+                    <li key={index}>{ingredient}</li>
+                  ))}
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium text-md">Instructions</h3>
+                <ol>
+                  {recipe.instructions.map((instruction, index) => (
+                    <li key={index} className="text-sm">
+                      Step {index + 1}: {instruction}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+            <div>{recipe.likes.length}</div>
+          </div>
+        ))
+      ) : (
+        <p>No recipes found.</p>
+      )}
+    </div>
+  </TabsContent>
+));
+
 export default function Profile() {
   const [date, setDate] = useState(new Date());
   const [query, setQuery] = useState("");
@@ -20,72 +88,6 @@ export default function Profile() {
   const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
   const RECIPEbyUSER_API = (id) =>
     `http://localhost:5000/api/recipe/get-recipe/${id}`;
-
-  const MemoizedUsername = memo(() => (
-    <div className="flex flex-col justify-center space-y-2">
-      <p className="font-bold text-xl">{userData?.name}</p>
-      <EditProfileButton className="bg-gray-200 py-2 px-6 rounded-[5px] self-start" />
-    </div>
-  ));
-
-  const MemoizedRecipeLists = memo(({ recipes }) => (
-    <TabsContent value="recipes" className="">
-      <div className="flex justify-end items-end w-full pb-4">
-        <AddRecipeButton />
-      </div>
-      <div className="space-y-4">
-        {recipes.length > 0 ? (
-          recipes.map((recipe) => (
-            <div
-              className="w-full border border-gray-200 p-4 rounded-md bg-gray-50"
-              key={recipe._id}
-            >
-              <div className="flex flex-row space-x-2">
-                <div className="p-6 bg-gray-200  rounded-full" />
-                <div className="flex justify-between w-full flex-row">
-                  <div>
-                    <p className="text-sm font-medium">
-                      {recipe.createdBy?.name}
-                    </p>
-                    <p className="text-xs">{recipe.timeSince}</p>
-                  </div>
-                  <div className="flex flex-row space-x-2 items-center">
-                    <FaBookmark />
-                    <RecipesMenubar recipeId={recipe._id} />
-
-                  </div>
-                </div>
-              </div>
-              <div className="px-2 py-4">
-                <p className="text-lg font-medium">{recipe.title}</p>
-                <p className="text-sm">{recipe.description}</p>
-                <div>
-                  <h3 className="text-md font-medium">Ingredients</h3>
-                  <p className="text-sm">
-                    {recipe.ingredients.map((ingredient, index) => (
-                      <li key={index}>{ingredient}</li>
-                    ))}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-medium text-md">Instructions</h3>
-                  <ol>
-                    {recipe.instructions.map((instruction, index) => (
-                      <li key={index} className="text-sm">
-                        Step {index + 1}: {instruction}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No recipes found.</p>
-        )}
-      </div>
-    </TabsContent>
-  ));
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -150,14 +152,12 @@ export default function Profile() {
     (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
   );
 
-
-
   return (
     <div className="py-28 px-12">
       <div className="flex-1 flex flex-col">
         <div className="p-6 flex flex-row space-x-6">
           <div className="p-16 rounded-full bg-gray-200"></div>
-          <MemoizedUsername />
+          <MemoizedUsername name={userData?.name} />
         </div>
         <div className="flex flex-row space-x-20 px-6">
           <h3>{userData?.following || 0} Following</h3>

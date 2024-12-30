@@ -1,37 +1,13 @@
-import React, { useState, useEffect, memo } from "react";
+import React, { useState, useEffect, memo, useMemo } from "react";
 import axios from "axios";
-import { Input } from "@/components/ui/input";
-import {
-  FaBell,
-  FaBookmark,
-  FaComment,
-  FaHeart,
-  FaShare,
-} from "react-icons/fa";
+import { FaBell, FaBookmark, FaComment, FaHeart, FaRegHeart, FaShare } from "react-icons/fa";
 import "../App.css";
-export default function Home() {
-  const [query, setQuery] = useState("");
-  const [account] = useState("Mawi");
-  const [recipe, setRecipes] = useState([]);
-  const [date, setDate] = useState(new Date());
 
-  const RecipeAPI = "http://localhost:5000/api/recipe/create-recipe";
-  const GetRecipeAPI = "http://localhost:5000/api/recipe/get-recipe";
+const RecipeAPI = "http://localhost:5000/api/recipe/create-recipe";
+const GetRecipeAPI = "http://localhost:5000/api/recipe/get-recipe";
 
-  const getRecipes = async () => {
-    try {
-      const response = await axios.get(GetRecipeAPI);
-      setRecipes(response.data);
-    } catch (error) {
-      console.error("Error fetching recipes:", error);
-    }
-  };
-
-  useEffect(() => {
-    getRecipes();
-  }, []);
-
-  const MemoizedRecipe = memo(({ recipes }) => (
+const MemoizedRecipe = memo(({ recipes }) => {
+  return (
     <div className="mt-4">
       {recipes.length > 0 ? (
         recipes.map((recipe) => (
@@ -55,9 +31,13 @@ export default function Home() {
             </div>
             <h3 className="text-xl font-semibold">{recipe.title}</h3>
             <p>{recipe.description}</p>
+            <div className="flex flex-row items-center space-x-1  ">
+            <FaHeart size={16} color="red"/>
+              <p className="text-sm">{recipe.likes.length}</p>
+            </div>
             <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
               <div className="flex flex-row space-x-2 items-center">
-                <FaHeart size={20} />
+                <FaRegHeart  size={20} />
                 <p className="text-sm">Like</p>
               </div>
               <div className="flex flex-row space-x-2 items-center">
@@ -76,11 +56,28 @@ export default function Home() {
         <p>No recipes found.</p>
       )}
     </div>
-  ));
-
-  const sortedRecipes = [...recipe].sort(
-    (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
   );
+});
+
+const Home = () => {
+  const [recipe, setRecipes] = useState([]);
+  
+  const getRecipes = async () => {
+    try {
+      const response = await axios.get(GetRecipeAPI);
+      setRecipes(response.data);
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+    }
+  };
+
+  useEffect(() => {
+    getRecipes();
+  }, []);
+
+  const sortedRecipes = useMemo(() => {
+    return [...recipe].sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+  }, [recipe]);
 
   return (
     <div className="flex-1 flex flex-col w-full py-20 px-10">
@@ -89,4 +86,6 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};
+
+export default Home;

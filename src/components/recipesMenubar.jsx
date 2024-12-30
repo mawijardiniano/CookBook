@@ -11,7 +11,7 @@ import {
   import { FaEllipsisH } from "react-icons/fa";
   import { useNavigate } from "react-router-dom";
   
-  export function RecipesMenubar({ recipeId }) {  // Accept the recipeId as a prop
+  export function RecipesMenubar({ recipeId }) { 
     const [userData, setUserData] = useState(null);
     const [recipes, setRecipes] = useState([]);
     const navigate = useNavigate();

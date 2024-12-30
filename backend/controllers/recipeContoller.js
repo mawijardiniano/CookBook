@@ -2,28 +2,27 @@ const Recipe = require("../models/recipe");
 const User = require("../models/user");
 
 const timeSince = (date) => {
-    const now = new Date();
-    const seconds = Math.floor((now - new Date(date)) / 1000);
+  const now = new Date();
+  const seconds = Math.floor((now - new Date(date)) / 1000);
 
-    const intervals = [
-      { label: "year", seconds: 31536000 },
-      { label: "month", seconds: 2592000 },
-      { label: "week", seconds: 604800 },
-      { label: "day", seconds: 86400 },
-      { label: "hour", seconds: 3600 },
-      { label: "minute", seconds: 60 },
-      { label: "second", seconds: 1 },
-    ];
+  const intervals = [
+    { label: "year", seconds: 31536000 },
+    { label: "month", seconds: 2592000 },
+    { label: "week", seconds: 604800 },
+    { label: "day", seconds: 86400 },
+    { label: "hour", seconds: 3600 },
+    { label: "minute", seconds: 60 },
+    { label: "second", seconds: 1 },
+  ];
 
-    for (const interval of intervals) {
-      const count = Math.floor(seconds / interval.seconds);
-      if (count >= 1) {
-        return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
-      }
+  for (const interval of intervals) {
+    const count = Math.floor(seconds / interval.seconds);
+    if (count >= 1) {
+      return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
     }
-    return "Just now";
-  };
-
+  }
+  return "Just now";
+};
 
 const createRecipe = async (req, res) => {
   const { title, description, ingredients, instructions } = req.body;
@@ -46,26 +45,24 @@ const createRecipe = async (req, res) => {
 
 const getRecipeByUser = async (req, res) => {
   try {
-    const {id} = req.params 
-    const recipes = await Recipe.find({createdBy: id}).populate({
-      path: 'createdBy',
-      select: 'name',
+    const { id } = req.params;
+    const recipes = await Recipe.find({ createdBy: id }).populate({
+      path: "createdBy",
+      select: "name",
     });
     const recipesWithTimeSince = recipes.map((recipe) => ({
       ...recipe.toObject(),
       timeSince: timeSince(recipe.createdOn),
     }));
-    res.json(recipesWithTimeSince)
-  } catch (error) {
-    
-  }
-}
+    res.json(recipesWithTimeSince);
+  } catch (error) {}
+};
 
 const getRecipes = async (req, res) => {
   try {
     const recipes = await Recipe.find().populate({
-      path: 'createdBy',
-      select: 'name',
+      path: "createdBy",
+      select: "name",
     });
     const recipesWithTimeSince = recipes.map((recipe) => ({
       ...recipe.toObject(),
@@ -79,12 +76,30 @@ const getRecipes = async (req, res) => {
 
 const deleteRecipe = async (req, res) => {
   try {
-    const {id} = req.params
-    const recipe = await Recipe.findByIdAndDelete(id)
+    const { id } = req.params;
+    const recipe = await Recipe.findByIdAndDelete(id);
     res.json(recipe);
-  } catch (error) {
-    
-  }
-}
+  } catch (error) {}
+};
 
-module.exports = { createRecipe, getRecipes,getRecipeByUser,deleteRecipe };
+const likeRecipe = async (req, res) => {
+  const { id } = req.params;
+  const {userId} = req.body;
+  try {
+    const updatedRecipe = await Recipe.findOneAndUpdate(
+      { _id: id, likes: { $ne: userId } }, 
+      {
+        $addToSet: { likes: userId },
+      },
+      { new: true } 
+    );
+
+    if (!updatedRecipe) {
+      return res.status(404).json({ message: 'Recipe not found or already liked' });
+    }
+
+    res.status(200).json(updatedRecipe);
+  } catch (error) {}
+};
+
+module.exports = { createRecipe, getRecipes, getRecipeByUser, deleteRecipe,likeRecipe };
