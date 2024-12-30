@@ -6,6 +6,7 @@ import {
   FaBookmark,
   FaComment,
   FaHeart,
+  FaRegBookmark,
   FaRegHeart,
   FaShare,
 } from "react-icons/fa";
@@ -21,7 +22,7 @@ const LOGGEDUSER_API = (userId) =>
   `http://localhost:5000/api/user/user/${userId}`;
 const saveRecipeAPI = (id) =>
   `http://localhost:5000/api/recipe/save-recipe/${id}`;
-const UnSAveRecipeAPI = (id) =>
+const UnsaveRecipeAPI = (id) =>
   `http://localhost:5000/api/recipe/unsave-recipe/${id}`;
 
 const MemoizedLikes = memo(({ likes }) => {
@@ -33,86 +34,110 @@ const MemoizedLikes = memo(({ likes }) => {
   );
 });
 
-const MemoizedRecipeCard = memo(({ recipe, handleLikeRecipe, isLiked }) => {
-  const memoizedRecipeCard = useMemo(() => {
-    return (
-      <div
-        key={recipe._id}
-        className="border py-2 px-4 mb-4 rounded-[6px] bg-white"
-      >
-        <div className="flex flex-row space-x-2 items-center">
-          <div className="p-6 rounded-full bg-gray-200" />
-          <div className="flex flex-row items-center justify-between w-full">
-            <div>
-              <p className="text-sm font-medium">
-                {recipe.createdBy?.name || "Null"}
-              </p>
-              <p className="text-[12px]">{recipe.timeSince}</p>
-            </div>
-            <div>
-              <FaBookmark />
+const MemoizedRecipeCard = memo(
+  ({ recipe, handleLikeRecipe, handleSaveRecipe, isSaved, isLiked }) => {
+    const memoizedRecipeCard = useMemo(() => {
+      return (
+        <div
+          key={recipe._id}
+          className="border py-2 px-4 mb-4 rounded-[6px] bg-gray-100"
+        >
+          <div className="flex flex-row space-x-2 items-center">
+            <div className="p-6 rounded-full bg-gray-200" />
+            <div className="flex flex-row items-center justify-between w-full">
+              <div>
+                <p className="text-sm font-medium">
+                  {recipe.createdBy?.name || "Null"}
+                </p>
+                <p className="text-[12px]">{recipe.timeSince}</p>
+              </div>
+              <div>
+                {isSaved[recipe._id] ? (
+                  <FaBookmark
+                    onClick={() => handleSaveRecipe(recipe._id)}
+                    color="yellow"
+                    size={20}
+                  />
+                ) : (
+                  <>
+                    <FaRegBookmark
+                      onClick={() => handleSaveRecipe(recipe._id)}
+                      size={20}
+                    />
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-        <h3 className="text-xl font-semibold">{recipe.title}</h3>
-        <p>{recipe.description}</p>
-        <div className="flex flex-row items-center space-x-1">
-          <MemoizedLikes likes={recipe.likes.length} />
-        </div>
-        <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
-          <div className="flex flex-row space-x-2 items-center">
-            {isLiked[recipe._id] ? (
-              <FaHeart
-                onClick={() => handleLikeRecipe(recipe._id)}
-                color="red"
-                size={20}
-              />
-            ) : (
-              <>
-                <FaRegHeart
+          <h3 className="text-xl font-semibold">{recipe.title}</h3>
+          <p>{recipe.description}</p>
+          <div className="flex flex-row items-center space-x-1">
+            <MemoizedLikes likes={recipe.likes.length} />
+          </div>
+          <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
+            <div className="flex flex-row space-x-2 items-center">
+              {isLiked[recipe._id] ? (
+                <FaHeart
                   onClick={() => handleLikeRecipe(recipe._id)}
+                  color="red"
                   size={20}
                 />
-                <p className="text-sm">Like</p>
-              </>
-            )}
-          </div>
+              ) : (
+                <>
+                  <FaRegHeart
+                    onClick={() => handleLikeRecipe(recipe._id)}
+                    size={20}
+                  />
+                  <p className="text-sm">Like</p>
+                </>
+              )}
+            </div>
 
-          <div className="flex flex-row space-x-2 items-center">
-            <FaComment size={20} />
-            <p className="text-sm">Comment</p>
-          </div>
+            <div className="flex flex-row space-x-2 items-center">
+              <FaComment size={20} />
+              <p className="text-sm">Comment</p>
+            </div>
 
-          <div className="flex flex-row space-x-2 items-center">
-            <FaShare size={20} />
-            <p className="text-sm">Share</p>
+            <div className="flex flex-row space-x-2 items-center">
+              <FaShare size={20} />
+              <p className="text-sm">Share</p>
+            </div>
           </div>
         </div>
+      );
+    }, [
+      recipe._id,
+      recipe.likes.length,
+      isSaved[recipe._id],
+      isLiked[recipe._id],
+    ]);
+
+    return memoizedRecipeCard;
+  }
+);
+
+const MemoizedRecipe = memo(
+  ({ recipes, handleLikeRecipe, handleSaveRecipe, isSaved, isLiked }) => {
+    return (
+      <div className="mt-4">
+        {recipes.length > 0 ? (
+          recipes.map((recipe) => (
+            <MemoizedRecipeCard
+              key={recipe._id}
+              recipe={recipe}
+              handleLikeRecipe={handleLikeRecipe}
+              handleSaveRecipe={handleSaveRecipe}
+              isLiked={isLiked}
+              isSaved={isSaved}
+            />
+          ))
+        ) : (
+          <p>No recipes found.</p>
+        )}
       </div>
     );
-  }, [recipe._id, recipe.likes.length, isLiked[recipe._id]]);
-
-  return memoizedRecipeCard;
-});
-
-const MemoizedRecipe = memo(({ recipes, handleLikeRecipe, isLiked }) => {
-  return (
-    <div className="mt-4">
-      {recipes.length > 0 ? (
-        recipes.map((recipe) => (
-          <MemoizedRecipeCard
-            key={recipe._id}
-            recipe={recipe}
-            handleLikeRecipe={handleLikeRecipe}
-            isLiked={isLiked}
-          />
-        ))
-      ) : (
-        <p>No recipes found.</p>
-      )}
-    </div>
-  );
-});
+  }
+);
 
 const Home = () => {
   const [recipes, setRecipes] = useState([]);
@@ -207,7 +232,7 @@ const Home = () => {
     getRecipes();
   }, []);
 
-  const handleLikeRecipe = async (id) => {
+  const handleSaveRecipe = async (id) => {
     if (!userIdToUse) {
       console.error("No user ID found.");
       return;
@@ -215,14 +240,14 @@ const Home = () => {
 
     try {
       const response = isLiked[id]
-        ? await axios.put(UnLikeRecipeAPI(id), { userId: userIdToUse })
-        : await axios.put(LikeRecipeAPI(id), { userId: userIdToUse });
+        ? await axios.put(UnsaveRecipeAPI(id), { userId: userIdToUse })
+        : await axios.put(saveRecipeAPI(id), { userId: userIdToUse });
 
       if (response.status === 200) {
-        const updatedIsLiked = { ...isLiked, [id]: !isLiked[id] };
-        localStorage.setItem("isLiked", JSON.stringify(updatedIsLiked));
+        const updatedIsSaved = { ...isSaved, [id]: !isSaved[id] };
+        localStorage.setItem("isSaved", JSON.stringify(updatedIsSaved));
 
-        setIsLiked(updatedIsLiked);
+        setIsSaved(updatedIsSaved);
 
         getRecipes();
       }
@@ -231,12 +256,11 @@ const Home = () => {
     }
   };
   useEffect(() => {
-    const storedIsLiked = JSON.parse(localStorage.getItem("isLiked")) || {};
-    setIsLiked(storedIsLiked);
+    const storedIsSaved = JSON.parse(localStorage.getItem("isSaved")) || {};
+    setIsSaved(storedIsSaved);
 
     getRecipes();
   }, []);
-
 
   return (
     <div className="flex-1 flex flex-col w-full py-20 px-10">
@@ -244,7 +268,9 @@ const Home = () => {
         <MemoizedRecipe
           recipes={sortedRecipes}
           handleLikeRecipe={handleLikeRecipe}
+          handleSaveRecipe={handleSaveRecipe}
           isLiked={isLiked}
+          isSaved={isSaved}
         />
       </div>
     </div>
