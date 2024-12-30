@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const { OAuth2Client } = require("google-auth-library");
 
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const googleLogin = async (req, res) => {
@@ -114,7 +115,13 @@ const userLogin = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().populate("likedRecipes");
+    const users = await User.find().populate("likedRecipes").populate({
+    path: "savedRecipes",
+    populate: {
+      path: "createdBy",
+      model: "User",
+    },
+  });;
     res.json(users);
   } catch (error) {}
 };
@@ -125,6 +132,12 @@ const getUserLoggedin = async (req, res) => {
     const user = await User.findById(userId)
   .populate({
     path: "likedRecipes",
+    populate: {
+      path: "createdBy",
+      model: "User",
+    },
+  }).populate({
+    path: "savedRecipes",
     populate: {
       path: "createdBy",
       model: "User",
@@ -140,6 +153,7 @@ const getUserLoggedin = async (req, res) => {
       name: user.name,
       email: user.email,
       likedRecipes: user.likedRecipes,
+      savedRecipes: user.savedRecipes,
     });
   } catch (error) {
     console.error(error);

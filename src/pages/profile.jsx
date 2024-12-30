@@ -40,11 +40,11 @@ const timeSince = (date) => {
 };
 
 const MemoizedLikedRecipes = memo(({ userData }) => (
-  <div className="bg-gray-100 p-4">
+  <div className="">
     {userData ? (
       userData.likedRecipes && userData.likedRecipes.length > 0 ? (
         userData.likedRecipes.map((recipe) => (
-          <div key={recipe._id}>
+          <div key={recipe._id} className="mb-4 bg-gray-100 p-4 border border-gray-200 rounded-md">
             <div className="flex flex-row space-x-2">
               <div className="p-6 bg-gray-200 rounded-full" />
               <div className="flex justify-between w-full flex-row">
@@ -61,8 +61,8 @@ const MemoizedLikedRecipes = memo(({ userData }) => (
                 </div>
               </div>
             </div>
-            <h3>{recipe.title}</h3>
-            <p>{recipe.description}</p>
+            <h3 className="mt-4 text-lg font-semibold">{recipe.title}</h3>
+            <p className="text-sm">{recipe.description}</p>
           </div>
         ))
       ) : (
@@ -73,6 +73,42 @@ const MemoizedLikedRecipes = memo(({ userData }) => (
     )}
   </div>
 ));
+const MemoizedSavedRecipes = memo(({ userData }) => (
+  <div className="">
+    {userData ? (
+      userData.savedRecipes && userData.savedRecipes.length > 0 ? (
+        userData.savedRecipes.map((recipe) => (
+          <div key={recipe._id} className="mb-4 bg-gray-100 p-4 border border-gray-200 rounded-md">
+  
+            <div className="flex flex-row space-x-2">
+              <div className="p-6 bg-gray-200 rounded-full" />
+              <div className="flex justify-between w-full flex-row">
+                <div className="flex justify-center flex-col">
+                  <p className="text-sm font-medium">
+                    {typeof recipe.createdBy === "string"
+                      ? recipe.createdBy
+                      : recipe.createdBy?.name || "Unknown"}
+                  </p>
+                  <p className="text-xs">{timeSince(recipe?.createdOn)}</p>
+                </div>
+                <div className="flex flex-row space-x-2 items-center">
+                  <FaBookmark />
+                </div>
+              </div>
+            </div>
+            <h3 className="mt-4 text-lg font-semibold">{recipe.title}</h3>
+            <p className="text-sm">{recipe.description}</p>
+          </div>
+        ))
+      ) : (
+        <p>No Saved recipes found.</p>
+      )
+    ) : (
+      <p>Loading user data...</p>
+    )}
+  </div>
+));
+
 
 const MemoizedRecipeLists = memo(({ recipes }) => (
   <TabsContent value="recipes" className="">
@@ -192,7 +228,7 @@ export default function Profile() {
             },
           });
           setUserData(response.data);
-          console.log("liked", response.data.likedRecipes);
+          console.log("saved", response.data.savedRecipes);
         } catch (error) {
           console.error(
             "Error fetching user data:",
@@ -247,11 +283,11 @@ export default function Profile() {
             </TabsTrigger>
           </TabsList>
           <MemoizedRecipeLists recipes={sortedRecipes} />
-          <TabsContent value="saved" className="p-4">
-            Show saved recipes
+          <TabsContent value="saved">
+            <MemoizedSavedRecipes userData={userData} />
           </TabsContent>
           <TabsContent value="likes">
-    <MemoizedLikedRecipes userData={userData}/>
+            <MemoizedLikedRecipes userData={userData} />
           </TabsContent>
         </Tabs>
       </div>

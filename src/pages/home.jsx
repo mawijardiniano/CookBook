@@ -239,7 +239,7 @@ const Home = () => {
     }
 
     try {
-      const response = isLiked[id]
+      const response = isSaved[id]
         ? await axios.put(UnsaveRecipeAPI(id), { userId: userIdToUse })
         : await axios.put(saveRecipeAPI(id), { userId: userIdToUse });
 

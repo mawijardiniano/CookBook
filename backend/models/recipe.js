@@ -50,11 +50,11 @@ const recipeSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  saved: {
+  likes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     default: [],
-  }
+  }],
 });
 
 module.exports = mongoose.model('Recipe', recipeSchema);

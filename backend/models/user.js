@@ -16,8 +16,8 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: function() {
-      return !this.googleId; 
+    required: function () {
+      return !this.googleId;
     },
   },
   following: {
@@ -30,6 +30,6 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
   likedRecipes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
-  savedRecipes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }]
+  savedRecipes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
 });
 module.exports = mongoose.model("User", userSchema);
