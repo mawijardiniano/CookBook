@@ -97,6 +97,15 @@ const likeRecipe = async (req, res) => {
     if (!updatedRecipe) {
       return res.status(404).json({ message: 'Recipe not found or already liked' });
     }
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { likedRecipes: id } },
+      { new: true } 
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
     res.status(200).json(updatedRecipe);
   } catch (error) {}
@@ -119,10 +128,19 @@ const unlikeRecipe = async (req, res) => {
       return res.status(404).json({ message: 'Recipe not found or already liked' });
     }
 
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { likedRecipes: id } },
+      { new: true } 
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     res.status(200).json(updatedRecipe);
   } catch (error) {}
 };
-
 
 
 

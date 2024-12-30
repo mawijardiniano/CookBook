@@ -29,5 +29,6 @@ const userSchema = new mongoose.Schema({
   likes: {
     type: String,
   },
+  likedRecipes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }]
 });
 module.exports = mongoose.model("User", userSchema);

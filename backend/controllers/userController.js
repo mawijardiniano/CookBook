@@ -107,14 +107,14 @@ const userLogin = async (req, res) => {
       message: "Login Successful",
     });
   } catch (error) {
-    console.error("Error during login:", error.message); // Log the error message
+    console.error("Error during login:", error.message);
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().populate("likedRecipes");
     res.json(users);
   } catch (error) {}
 };
@@ -123,7 +123,7 @@ const getUserLoggedin = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate("likedRecipes");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -133,6 +133,7 @@ const getUserLoggedin = async (req, res) => {
       id: user._id,
       name: user.name,
       email: user.email,
+      likedRecipes: user.likedRecipes,
     });
   } catch (error) {
     console.error(error);
@@ -142,26 +143,27 @@ const getUserLoggedin = async (req, res) => {
 
 const editUsername = async (req, res) => {
   try {
-    const { userId } = req.params; 
+    const { userId } = req.params;
     const { name } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { name },
-      { new: true } 
+      { new: true }
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ status: 'error', message: 'User not found' });
+      return res
+        .status(404)
+        .json({ status: "error", message: "User not found" });
     }
 
-    res.status(200).json({ status: 'ok', data: updatedUser });
+    res.status(200).json({ status: "ok", data: updatedUser });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ status: 'error', message: 'Server error' });
+    res.status(500).json({ status: "error", message: "Server error" });
   }
 };
-
 
 module.exports = {
   userLogin,

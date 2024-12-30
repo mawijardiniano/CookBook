@@ -16,6 +16,25 @@ const MemoizedUsername = memo(({ name }) => {
   );
 });
 
+const MemoizedLikedRecipes = memo(({ userData }) => (
+  <div>
+    {userData ? (
+      userData.likedRecipes && userData.likedRecipes.length > 0 ? (
+        userData.likedRecipes.map((recipe) => (
+          <div key={recipe._id}>
+            <h3>{recipe.title}</h3>
+            <p>{recipe.description}</p>
+          </div>
+        ))
+      ) : (
+        <p>No liked recipes found.</p>
+      )
+    ) : (
+      <p>Loading user data...</p>
+    )}
+  </div>
+));
+
 const MemoizedRecipeLists = memo(({ recipes }) => (
   <TabsContent value="recipes" className="">
     <div className="flex justify-end items-end w-full pb-4">
@@ -134,6 +153,7 @@ export default function Profile() {
             },
           });
           setUserData(response.data);
+          console.log("liked", response.data.likedRecipes);
         } catch (error) {
           console.error(
             "Error fetching user data:",
@@ -192,7 +212,7 @@ export default function Profile() {
             Show saved recipes
           </TabsContent>
           <TabsContent value="likes" className="p-4">
-            Show liked recipes.
+    <MemoizedLikedRecipes userData={userData}/>
           </TabsContent>
         </Tabs>
       </div>
