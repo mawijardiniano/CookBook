@@ -1,9 +1,9 @@
 const User = require("../models/user");
+const Recipe = require("../models/recipe");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const { OAuth2Client } = require("google-auth-library");
-
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -115,13 +115,15 @@ const userLogin = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().populate("likedRecipes").populate({
-    path: "savedRecipes",
-    populate: {
-      path: "createdBy",
-      model: "User",
-    },
-  });;
+    const users = await User.find()
+      .populate("likedRecipes")
+      .populate({
+        path: "savedRecipes",
+        populate: {
+          path: "createdBy",
+          model: "User",
+        },
+      });
     res.json(users);
   } catch (error) {}
 };
@@ -130,19 +132,20 @@ const getUserLoggedin = async (req, res) => {
   try {
     const { userId } = req.user;
     const user = await User.findById(userId)
-  .populate({
-    path: "likedRecipes",
-    populate: {
-      path: "createdBy",
-      model: "User",
-    },
-  }).populate({
-    path: "savedRecipes",
-    populate: {
-      path: "createdBy",
-      model: "User",
-    },
-  });
+      .populate({
+        path: "likedRecipes",
+        populate: {
+          path: "createdBy",
+          model: "User",
+        },
+      })
+      .populate({
+        path: "savedRecipes",
+        populate: {
+          path: "createdBy",
+          model: "User",
+        },
+      });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -185,6 +188,8 @@ const editUsername = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   userLogin,
   userSignup,
@@ -192,4 +197,5 @@ module.exports = {
   getAllUsers,
   googleLogin,
   editUsername,
+ 
 };

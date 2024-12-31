@@ -230,6 +230,7 @@ export default function Profile() {
               Authorization: `Bearer ${token}`,
             },
           });
+          
           setRecipe(response.data);
         } catch (error) {
           console.error(
@@ -260,8 +261,14 @@ export default function Profile() {
     } catch (error) {
       console.error("Error decoding token:", error.message);
     }
+
   }, []);
 
+  
+  const totalLikes = recipe.reduce(
+    (sum, recipe) => sum + (recipe.likes?.length || 0),
+    0
+  );
   const sortedRecipes = [...recipe].sort(
     (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
   );
@@ -276,7 +283,7 @@ export default function Profile() {
         <div className="flex flex-row space-x-20 px-6">
           <h3>{userData?.following || 0} Following</h3>
           <h3>{userData?.followers || 0} Followers</h3>
-          <h3>{userData?.likes || 0} Likes</h3>
+          <h3>{totalLikes} Likes</h3>
         </div>
       </div>
       <div className="px-6 py-10">

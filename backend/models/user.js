@@ -26,9 +26,7 @@ const userSchema = new mongoose.Schema({
   followers: {
     type: String,
   },
-  likes: {
-    type: String,
-  },
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
   likedRecipes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
   savedRecipes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
 });
