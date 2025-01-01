@@ -17,13 +17,13 @@ function MainApp() {
   const hideSidebar =
     location.pathname === "/" || location.pathname === "/signup";
 
-  useEffect(() => {
-    scan({
-      enabled: true,
-      log: true,
-      highlight: true,
-    });
-  }, []);
+  // useEffect(() => {
+  //   scan({
+  //     enabled: true,
+  //     log: true,
+  //     highlight: true,
+  //   });
+  // }, []);
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">

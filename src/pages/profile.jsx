@@ -178,6 +178,7 @@ const MemoizedRecipeLists = memo(({ recipes }) => (
               </div>
             </div>
             <div>{recipe.likes.length}</div>
+            
           </div>
         ))
       ) : (
