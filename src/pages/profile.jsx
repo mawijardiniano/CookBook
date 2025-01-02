@@ -2,7 +2,14 @@ import React, { useState, useEffect, memo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { FaBookmark, FaEllipsisH } from "react-icons/fa";
+import {
+  FaBookmark,
+  FaEllipsisH,
+  FaHeart,
+  FaRegHeart,
+  FaComment,
+  FaShare,
+} from "react-icons/fa";
 import AddRecipeButton from "../components/addRecipeButton";
 import EditProfileButton from "../components/editProfileButton";
 import { RecipesMenubar } from "../components/recipesMenubar";
@@ -13,6 +20,15 @@ const MemoizedUsername = memo(({ name }) => {
       <p className="font-bold text-xl">{name}</p>
       <EditProfileButton className="bg-gray-200 py-2 px-6 rounded-[5px] self-start" />
     </div>
+  );
+});
+
+const MemoizedLikes = memo(({ likes }) => {
+  return (
+    <>
+      <FaHeart size={16} color="red" />
+      <p className="text-sm">{likes}</p>
+    </>
   );
 });
 
@@ -114,7 +130,7 @@ const MemoizedSavedRecipes = memo(({ userData }) => (
   </div>
 ));
 
-const MemoizedRecipeLists = memo(({ recipes }) => (
+const MemoizedRecipeLists = memo(({ recipes, handleLikeRecipe, isLiked }) => (
   <TabsContent value="recipes" className="">
     <div className="flex justify-end items-end w-full pb-4">
       <AddRecipeButton />
@@ -123,7 +139,7 @@ const MemoizedRecipeLists = memo(({ recipes }) => (
       {recipes.length > 0 ? (
         recipes.map((recipe) => (
           <div
-            className="w-full border border-gray-200 p-4 rounded-md bg-gray-50"
+            className="w-full border border-gray-200 px-4 py-2 rounded-md bg-gray-50"
             key={recipe._id}
           >
             <div className="flex flex-row space-x-2">
@@ -149,9 +165,7 @@ const MemoizedRecipeLists = memo(({ recipes }) => (
                 <ul className="text-sm">
                   {Array.isArray(recipe.ingredients) &&
                     recipe.ingredients.map((ingredient, index) => (
-                      <li key={index}>
-                        {ingredient.name}
-                      </li>
+                      <li key={index}>{ingredient.name}</li>
                     ))}
                 </ul>
               </div>
@@ -167,18 +181,51 @@ const MemoizedRecipeLists = memo(({ recipes }) => (
                 </ol>
               </div>
               <div>
-              <ol className="flex flex-row space-x-2 pt-2">
+                <ol className="flex flex-row space-x-2 pt-2">
                   {Array.isArray(recipe.tags) &&
                     recipe.tags.map((tags, index) => (
-                      <li key={index} className="text-[10px] font-medium bg-gray-200 px-2 rounded-md">
+                      <li
+                        key={index}
+                        className="text-[10px] font-medium bg-gray-200 px-2 rounded-md"
+                      >
                         {tags}
                       </li>
                     ))}
                 </ol>
               </div>
             </div>
-            <div>{recipe.likes.length}</div>
-            
+            <div className="flex flex-row items-center space-x-1">
+            <MemoizedLikes likes={recipe.likes.length} />
+          </div>
+            <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
+              <div className="flex flex-row space-x-2 items-center">
+                {isLiked[recipe._id] ? (
+                  <FaHeart
+                    onClick={() => handleLikeRecipe(recipe._id)}
+                    color="red"
+                    size={20}
+                  />
+                ) : (
+                  <>
+                    <FaRegHeart
+                      onClick={() => handleLikeRecipe(recipe._id)}
+                      size={20}
+                    />
+                    <p className="text-sm">Like</p>
+                  </>
+                )}
+              </div>
+
+              <div className="flex flex-row space-x-2 items-center">
+                <FaComment size={20} />
+                <p className="text-sm">Comment</p>
+              </div>
+
+              <div className="flex flex-row space-x-2 items-center">
+                <FaShare size={20} />
+                <p className="text-sm">Share</p>
+              </div>
+            </div>
           </div>
         ))
       ) : (
@@ -188,7 +235,6 @@ const MemoizedRecipeLists = memo(({ recipes }) => (
   </TabsContent>
 ));
 
-
 export default function Profile() {
   const [date, setDate] = useState(new Date());
   const [query, setQuery] = useState("");
@@ -197,11 +243,75 @@ export default function Profile() {
   const [recipe, setRecipe] = useState([]);
   const [following, setFollowing] = useState(30);
   const [followers, setFollowers] = useState(100);
-  const [likes, setLikes] = useState(19837);
+  const [isLiked, setIsLiked] = useState({});
 
   const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
   const RECIPEbyUSER_API = (id) =>
     `http://localhost:5000/api/recipe/get-recipe/${id}`;
+  const LikeRecipeAPI = (id) =>
+    `http://localhost:5000/api/recipe/like-recipe/${id}`;
+  const UnLikeRecipeAPI = (id) =>
+    `http://localhost:5000/api/recipe/unlike-recipe/${id}`;
+
+  const fetchRecipe = async (userIdToUse, token) => {
+    try {
+      const response = await axios.get(RECIPEbyUSER_API(userIdToUse), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRecipe(response.data);
+    } catch (error) {
+      console.error(
+        "Error fetching recipe data:",
+        error?.response?.data || error.message
+      );
+    }
+  };
+
+  const fetchUserData = async (userIdToUse, token) => {
+    try {
+      const response = await axios.get(LOGGEDUSER_API(userIdToUse), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUserData(response.data);
+      console.log("Saved recipes:", response.data.savedRecipes);
+    } catch (error) {
+      console.error(
+        "Error fetching user data:",
+        error?.response?.data || error.message
+      );
+    }
+  };
+
+  const handleLikeRecipe = async (id) => {
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
+
+    if (!userIdToUse) {
+      console.error("No user ID found.");
+      return;
+    }
+
+    try {
+      const response = isLiked[id]
+        ? await axios.put(UnLikeRecipeAPI(id), { userId: userIdToUse })
+        : await axios.put(LikeRecipeAPI(id), { userId: userIdToUse });
+
+      if (response.status === 200) {
+        const updatedIsLiked = { ...isLiked, [id]: !isLiked[id] };
+        localStorage.setItem("isLiked", JSON.stringify(updatedIsLiked));
+        setIsLiked(updatedIsLiked);
+
+        fetchRecipe(userIdToUse, token);
+      }
+    } catch (error) {
+      console.error("Error handling like/unlike recipe:", error);
+    }
+  };
+
+  useEffect(() => {
+    const storedIsLiked = JSON.parse(localStorage.getItem("isLiked")) || {};
+    setIsLiked(storedIsLiked);
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -224,48 +334,13 @@ export default function Profile() {
         return;
       }
 
-      const fetchRecipe = async () => {
-        try {
-          const response = await axios.get(RECIPEbyUSER_API(userIdToUse), {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          
-          setRecipe(response.data);
-        } catch (error) {
-          console.error(
-            "Error fetching recipe data:",
-            error?.response?.data || error.message
-          );
-        }
-      };
-
-      const fetchUserData = async () => {
-        try {
-          const response = await axios.get(LOGGEDUSER_API(userIdToUse), {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setUserData(response.data);
-          console.log("saved", response.data.savedRecipes);
-        } catch (error) {
-          console.error(
-            "Error fetching user data:",
-            error?.response?.data || error.message
-          );
-        }
-      };
-      fetchRecipe();
-      fetchUserData();
+      fetchRecipe(userIdToUse, token);
+      fetchUserData(userIdToUse, token);
     } catch (error) {
       console.error("Error decoding token:", error.message);
     }
-
   }, []);
 
-  
   const totalLikes = recipe.reduce(
     (sum, recipe) => sum + (recipe.likes?.length || 0),
     0
@@ -309,7 +384,11 @@ export default function Profile() {
               Likes
             </TabsTrigger>
           </TabsList>
-          <MemoizedRecipeLists recipes={sortedRecipes} />
+          <MemoizedRecipeLists
+            recipes={sortedRecipes}
+            handleLikeRecipe={handleLikeRecipe}
+            isLiked={isLiked}
+          />
           <TabsContent value="saved">
             <MemoizedSavedRecipes userData={userData} />
           </TabsContent>
