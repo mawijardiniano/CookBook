@@ -58,6 +58,7 @@ const timeSince = (date) => {
 
 const MemoizedLikedRecipes = memo(
   ({ userData, isLiked, handleLikeRecipe, isSaved, handleSaveRecipe }) => (
+    <TabsContent value="likes">
     <div className="">
       {userData ? (
         userData.likedRecipes && userData.likedRecipes.length > 0 ? (
@@ -138,9 +139,11 @@ const MemoizedLikedRecipes = memo(
         <p>Loading user data...</p>
       )}
     </div>
+    </TabsContent>
   )
 );
 const MemoizedSavedRecipes = memo(({ userData, isLiked, handleLikeRecipe, isSaved, handleSaveRecipe }) => (
+  <TabsContent value="saved">
   <div className="">
     {userData ? (
       userData.savedRecipes && userData.savedRecipes.length > 0 ? (
@@ -221,6 +224,7 @@ const MemoizedSavedRecipes = memo(({ userData, isLiked, handleLikeRecipe, isSave
       <p>Loading user data...</p>
     )}
   </div>
+  </TabsContent>
 ));
 
 const MemoizedRecipeLists = memo(({ recipes, handleLikeRecipe, isLiked, handleSaveRecipe, isSaved }) => (
@@ -394,89 +398,89 @@ export default function Profile() {
     }
   };
 
-  const handleSaveRecipe = async (id) => {
-    const token = localStorage.getItem("authToken");
-    const userIdToUse = jwtDecode(token)?.userId;
-    try {
-      const response = isSaved[id]
-        ? await axios.put(UnsaveRecipeAPI(id), { userId: userIdToUse })
-        : await axios.put(saveRecipeAPI(id), { userId: userIdToUse });
+    const handleSaveRecipe = async (id) => {
+      const token = localStorage.getItem("authToken");
+      const userIdToUse = jwtDecode(token)?.userId;
+      try {
+        const response = isSaved[id]
+          ? await axios.put(UnsaveRecipeAPI(id), { userId: userIdToUse })
+          : await axios.put(saveRecipeAPI(id), { userId: userIdToUse });
 
-      if (response.status === 200) {
-        const updatedIsSaved = { ...isSaved, [id]: !isSaved[id] };
-        localStorage.setItem("isSaved", JSON.stringify(updatedIsSaved));
+        if (response.status === 200) {
+          const updatedIsSaved = { ...isSaved, [id]: !isSaved[id] };
+          localStorage.setItem("isSaved", JSON.stringify(updatedIsSaved));
 
-        setIsSaved(updatedIsSaved);
-
-        fetchRecipe(userIdToUse, token);
+          setIsSaved(updatedIsSaved);
+          fetchRecipe(userIdToUse, token)
+          fetchUserData(userIdToUse, token);
+        }
+      } catch (error) {
+        console.error("Error handling like/unlike recipe:", error);
       }
-    } catch (error) {
-      console.error("Error handling like/unlike recipe:", error);
-    }
-  };
-  useEffect(() => {
-    const storedIsSaved = JSON.parse(localStorage.getItem("isSaved")) || {};
-    setIsSaved(storedIsSaved);
-  }, []);
+    };
+    useEffect(() => {
+      const storedIsSaved = JSON.parse(localStorage.getItem("isSaved")) || {};
+      setIsSaved(storedIsSaved);
+    }, []);
 
-  const handleLikeRecipe = async (id) => {
-    const token = localStorage.getItem("authToken");
-    const userIdToUse = jwtDecode(token)?.userId;
-
-    if (!userIdToUse) {
-      console.error("No user ID found.");
-      return;
-    }
-
-    try {
-      const response = isLiked[id]
-        ? await axios.put(UnLikeRecipeAPI(id), { userId: userIdToUse })
-        : await axios.put(LikeRecipeAPI(id), { userId: userIdToUse });
-
-      if (response.status === 200) {
-        const updatedIsLiked = { ...isLiked, [id]: !isLiked[id] };
-        localStorage.setItem("isLiked", JSON.stringify(updatedIsLiked));
-        setIsLiked(updatedIsLiked);
-
-        fetchRecipe(userIdToUse, token);
-      }
-    } catch (error) {
-      console.error("Error handling like/unlike recipe:", error);
-    }
-  };
-
-  useEffect(() => {
-    const storedIsLiked = JSON.parse(localStorage.getItem("isLiked")) || {};
-    setIsLiked(storedIsLiked);
-  }, []);
-
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
-
-    if (!token) {
-      console.log("No token found");
-      return;
-    }
-
-    try {
-      const decodedToken = jwtDecode(token);
-      const userId = decodedToken?.userId;
-      const userIdToUse = userId || storedGoogleUser?._id;
+    const handleLikeRecipe = async (id) => {
+      const token = localStorage.getItem("authToken");
+      const userIdToUse = jwtDecode(token)?.userId;
 
       if (!userIdToUse) {
-        console.warn(
-          "No valid user ID found (neither decoded token nor Google User)."
-        );
+        console.error("No user ID found.");
         return;
       }
 
-      fetchRecipe(userIdToUse, token);
-      fetchUserData(userIdToUse, token);
-    } catch (error) {
-      console.error("Error decoding token:", error.message);
-    }
-  }, []);
+      try {
+        const response = isLiked[id]
+          ? await axios.put(UnLikeRecipeAPI(id), { userId: userIdToUse })
+          : await axios.put(LikeRecipeAPI(id), { userId: userIdToUse });
+
+        if (response.status === 200) {
+          const updatedIsLiked = { ...isLiked, [id]: !isLiked[id] };
+          localStorage.setItem("isLiked", JSON.stringify(updatedIsLiked));
+          setIsLiked(updatedIsLiked);
+fetchRecipe(userIdToUse, token)
+          fetchUserData(userIdToUse, token);
+        }
+      } catch (error) {
+        console.error("Error handling like/unlike recipe:", error);
+      }
+    };
+
+    useEffect(() => {
+      const storedIsLiked = JSON.parse(localStorage.getItem("isLiked")) || {};
+      setIsLiked(storedIsLiked);
+    }, []);
+
+    useEffect(() => {
+      const token = localStorage.getItem("authToken");
+      const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
+
+      if (!token) {
+        console.log("No token found");
+        return;
+      }
+
+      try {
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken?.userId;
+        const userIdToUse = userId || storedGoogleUser?._id;
+
+        if (!userIdToUse) {
+          console.warn(
+            "No valid user ID found (neither decoded token nor Google User)."
+          );
+          return;
+        }
+
+        fetchRecipe(userIdToUse, token);
+        fetchUserData(userIdToUse, token);
+      } catch (error) {
+        console.error("Error decoding token:", error.message);
+      }
+    }, []);
 
   const totalLikes = recipe.reduce(
     (sum, recipe) => sum + (recipe.likes?.length || 0),
@@ -528,7 +532,7 @@ export default function Profile() {
             isSaved={isSaved}
             handleSaveRecipe={handleSaveRecipe}
           />
-          <TabsContent value="saved">
+
             <MemoizedSavedRecipes
               userData={userData}
               isLiked={isLiked}
@@ -536,8 +540,6 @@ export default function Profile() {
               isSaved={isSaved}
               handleSaveRecipe={handleSaveRecipe}
             />
-          </TabsContent>
-          <TabsContent value="likes">
             <MemoizedLikedRecipes
               userData={userData}
               isLiked={isLiked}
@@ -545,7 +547,6 @@ export default function Profile() {
               isSaved={isSaved}
               handleSaveRecipe={handleSaveRecipe}
             />
-          </TabsContent>
         </Tabs>
       </div>
     </div>
