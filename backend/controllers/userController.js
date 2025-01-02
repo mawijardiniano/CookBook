@@ -157,6 +157,8 @@ const getUserLoggedin = async (req, res) => {
       email: user.email,
       likedRecipes: user.likedRecipes,
       savedRecipes: user.savedRecipes,
+      followers: user.followers,
+      following: user.following,
     });
   } catch (error) {
     console.error(error);
@@ -188,6 +190,52 @@ const editUsername = async (req, res) => {
   }
 };
 
+const FollowUser = async (req, res) => {
+  try {
+    console.log("Request params:", req.params);
+    console.log("Authenticated user ID:", req.user.userId);
+
+    const { userId } = req.params; 
+    const currentUserId = req.user.userId;
+
+    if (userId === currentUserId) {
+      return res.status(400).json({ message: "You cannot follow yourself." });
+    }
+
+    const targetUser = await User.findById(userId);
+    if (!targetUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    console.log("Target user found:", targetUser);
+
+    const updatedTargetUser = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { followers: currentUserId } },
+      { new: true }
+    );
+
+    console.log("Updated target user:", updatedTargetUser);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      currentUserId,
+      { $addToSet: { following: userId } },
+      { new: true }
+    ).populate("following", "name email");
+
+    console.log("Updated authenticated user:", updatedUser);
+
+    return res.status(200).json({
+      message: "User followed successfully.",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("FollowUser Error:", error);
+    res.status(500).json({ message: "An error occurred while following the user." });
+  }
+};
+
+
 
 
 module.exports = {
@@ -197,5 +245,5 @@ module.exports = {
   getAllUsers,
   googleLogin,
   editUsername,
-
+  FollowUser
 };

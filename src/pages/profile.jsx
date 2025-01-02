@@ -15,6 +15,8 @@ import AddRecipeButton from "../components/addRecipeButton";
 import EditProfileButton from "../components/editProfileButton";
 import { RecipesMenubar } from "../components/recipesMenubar";
 
+
+
 const MemoizedUsername = memo(({ name }) => {
   return (
     <div className="flex flex-col justify-center space-y-2">
@@ -59,26 +61,199 @@ const timeSince = (date) => {
 const MemoizedLikedRecipes = memo(
   ({ userData, isLiked, handleLikeRecipe, isSaved, handleSaveRecipe }) => (
     <TabsContent value="likes">
-    <div className="">
-      {userData ? (
-        userData.likedRecipes && userData.likedRecipes.length > 0 ? (
-          userData.likedRecipes.map((recipe) => (
+      <div className="">
+        {userData ? (
+          userData.likedRecipes && userData.likedRecipes.length > 0 ? (
+            userData.likedRecipes.map((recipe) => (
+              <div
+                key={recipe._id}
+                className="mb-4 bg-gray-100 px-4 py-2 border border-gray-200 rounded-md"
+              >
+                <div className="flex flex-row space-x-2">
+                  <div className="p-6 bg-gray-200 rounded-full" />
+                  <div className="flex justify-between w-full flex-row">
+                    <div className="flex justify-center flex-col">
+                      <p className="text-sm font-medium">
+                        {typeof recipe.createdBy === "string"
+                          ? recipe.createdBy
+                          : recipe.createdBy?.name || "Unknown"}
+                      </p>
+                      <p className="text-xs">{timeSince(recipe?.createdOn)}</p>
+                    </div>
+                    <div>
+                      {isSaved[recipe._id] ? (
+                        <FaBookmark
+                          onClick={() => handleSaveRecipe(recipe._id)}
+                          color="yellow"
+                          size={20}
+                        />
+                      ) : (
+                        <>
+                          <FaRegBookmark
+                            onClick={() => handleSaveRecipe(recipe._id)}
+                            size={20}
+                          />
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <h3 className="mt-4 text-lg font-semibold">{recipe.title}</h3>
+                <p className="text-sm">{recipe.description}</p>
+                <div className="flex flex-row items-center space-x-1">
+                  <MemoizedLikes likes={recipe.likes.length} />
+                </div>
+                <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
+                  <div className="flex flex-row space-x-2 items-center">
+                    {isLiked[recipe._id] ? (
+                      <FaHeart
+                        onClick={() => handleLikeRecipe(recipe._id)}
+                        color="red"
+                        size={20}
+                      />
+                    ) : (
+                      <>
+                        <FaRegHeart
+                          onClick={() => handleLikeRecipe(recipe._id)}
+                          size={20}
+                        />
+                        <p className="text-sm">Like</p>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="flex flex-row space-x-2 items-center">
+                    <FaComment size={20} />
+                    <p className="text-sm">Comment</p>
+                  </div>
+
+                  <div className="flex flex-row space-x-2 items-center">
+                    <FaShare size={20} />
+                    <p className="text-sm">Share</p>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No liked recipes found.</p>
+          )
+        ) : (
+          <p>Loading user data...</p>
+        )}
+      </div>
+    </TabsContent>
+  )
+);
+const MemoizedSavedRecipes = memo(
+  ({ userData, isLiked, handleLikeRecipe, isSaved, handleSaveRecipe }) => (
+    <TabsContent value="saved">
+      <div className="">
+        {userData ? (
+          userData.savedRecipes && userData.savedRecipes.length > 0 ? (
+            userData.savedRecipes.map((recipe) => (
+              <div
+                key={recipe._id}
+                className="mb-4 bg-gray-100 px-4 py-2 border border-gray-200 rounded-md"
+              >
+                <div className="flex flex-row space-x-2">
+                  <div className="p-6 bg-gray-200 rounded-full" />
+                  <div className="flex justify-between w-full flex-row">
+                    <div className="flex justify-center flex-col">
+                      <p className="text-sm font-medium">
+                        {typeof recipe.createdBy === "string"
+                          ? recipe.createdBy
+                          : recipe.createdBy?.name || "Unknown"}
+                      </p>
+                      <p className="text-xs">{timeSince(recipe?.createdOn)}</p>
+                    </div>
+                    <div>
+                      {isSaved[recipe._id] ? (
+                        <FaBookmark
+                          onClick={() => handleSaveRecipe(recipe._id)}
+                          color="yellow"
+                          size={20}
+                        />
+                      ) : (
+                        <>
+                          <FaRegBookmark
+                            onClick={() => handleSaveRecipe(recipe._id)}
+                            size={20}
+                          />
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <h3 className="mt-4 text-lg font-semibold">{recipe.title}</h3>
+                <p className="text-sm">{recipe.description}</p>
+                <div className="flex flex-row items-center space-x-1">
+                  <MemoizedLikes likes={recipe.likes.length} />
+                </div>
+                <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
+                  <div className="flex flex-row space-x-2 items-center">
+                    {isLiked[recipe._id] ? (
+                      <FaHeart
+                        onClick={() => handleLikeRecipe(recipe._id)}
+                        color="red"
+                        size={20}
+                      />
+                    ) : (
+                      <>
+                        <FaRegHeart
+                          onClick={() => handleLikeRecipe(recipe._id)}
+                          size={20}
+                        />
+                        <p className="text-sm">Like</p>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="flex flex-row space-x-2 items-center">
+                    <FaComment size={20} />
+                    <p className="text-sm">Comment</p>
+                  </div>
+
+                  <div className="flex flex-row space-x-2 items-center">
+                    <FaShare size={20} />
+                    <p className="text-sm">Share</p>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No Saved recipes found.</p>
+          )
+        ) : (
+          <p>Loading user data...</p>
+        )}
+      </div>
+    </TabsContent>
+  )
+);
+
+const MemoizedRecipeLists = memo(
+  ({ recipes, handleLikeRecipe, isLiked, handleSaveRecipe, isSaved }) => (
+    <TabsContent value="recipes" className="">
+      <div className="flex justify-end items-end w-full pb-4">
+        <AddRecipeButton />
+      </div>
+      <div className="space-y-4">
+        {recipes.length > 0 ? (
+          recipes.map((recipe) => (
             <div
+              className="w-full border border-gray-200 px-4 py-2 rounded-md bg-gray-50"
               key={recipe._id}
-              className="mb-4 bg-gray-100 px-4 py-2 border border-gray-200 rounded-md"
             >
               <div className="flex flex-row space-x-2">
                 <div className="p-6 bg-gray-200 rounded-full" />
                 <div className="flex justify-between w-full flex-row">
-                  <div className="flex justify-center flex-col">
+                  <div>
                     <p className="text-sm font-medium">
-                      {typeof recipe.createdBy === "string"
-                        ? recipe.createdBy
-                        : recipe.createdBy?.name || "Unknown"}
+                      {recipe.createdBy?.name || "Unknown"}
                     </p>
                     <p className="text-xs">{timeSince(recipe?.createdOn)}</p>
                   </div>
-                  <div>
+                  <div className="flex flex-row space-x-2 items-center">
                     {isSaved[recipe._id] ? (
                       <FaBookmark
                         onClick={() => handleSaveRecipe(recipe._id)}
@@ -93,11 +268,48 @@ const MemoizedLikedRecipes = memo(
                         />
                       </>
                     )}
+
+                    <RecipesMenubar recipeId={recipe._id} />
                   </div>
                 </div>
               </div>
-              <h3 className="mt-4 text-lg font-semibold">{recipe.title}</h3>
-              <p className="text-sm">{recipe.description}</p>
+              <div className="px-2 py-4">
+                <p className="text-lg font-medium">{recipe.title}</p>
+                <p className="text-sm">{recipe.description}</p>
+                <div>
+                  <h3 className="text-md font-medium">Ingredients</h3>
+                  <ul className="text-sm">
+                    {Array.isArray(recipe.ingredients) &&
+                      recipe.ingredients.map((ingredient, index) => (
+                        <li key={index}>{ingredient.name}</li>
+                      ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-medium text-md">Instructions</h3>
+                  <ol>
+                    {Array.isArray(recipe.instructions) &&
+                      recipe.instructions.map((instruction, index) => (
+                        <li key={index} className="text-sm">
+                          Step {index + 1}: {instruction.name}
+                        </li>
+                      ))}
+                  </ol>
+                </div>
+                <div>
+                  <ol className="flex flex-row space-x-2 pt-2">
+                    {Array.isArray(recipe.tags) &&
+                      recipe.tags.map((tags, index) => (
+                        <li
+                          key={index}
+                          className="text-[10px] font-medium bg-gray-200 px-2 rounded-md"
+                        >
+                          {tags}
+                        </li>
+                      ))}
+                  </ol>
+                </div>
+              </div>
               <div className="flex flex-row items-center space-x-1">
                 <MemoizedLikes likes={recipe.likes.length} />
               </div>
@@ -133,218 +345,12 @@ const MemoizedLikedRecipes = memo(
             </div>
           ))
         ) : (
-          <p>No liked recipes found.</p>
-        )
-      ) : (
-        <p>Loading user data...</p>
-      )}
-    </div>
+          <p>No recipes found.</p>
+        )}
+      </div>
     </TabsContent>
   )
 );
-const MemoizedSavedRecipes = memo(({ userData, isLiked, handleLikeRecipe, isSaved, handleSaveRecipe }) => (
-  <TabsContent value="saved">
-  <div className="">
-    {userData ? (
-      userData.savedRecipes && userData.savedRecipes.length > 0 ? (
-        userData.savedRecipes.map((recipe) => (
-          <div
-            key={recipe._id}
-            className="mb-4 bg-gray-100 px-4 py-2 border border-gray-200 rounded-md"
-          >
-            <div className="flex flex-row space-x-2">
-              <div className="p-6 bg-gray-200 rounded-full" />
-              <div className="flex justify-between w-full flex-row">
-                <div className="flex justify-center flex-col">
-                  <p className="text-sm font-medium">
-                    {typeof recipe.createdBy === "string"
-                      ? recipe.createdBy
-                      : recipe.createdBy?.name || "Unknown"}
-                  </p>
-                  <p className="text-xs">{timeSince(recipe?.createdOn)}</p>
-                </div>
-                <div>
-                  {isSaved[recipe._id] ? (
-                    <FaBookmark
-                      onClick={() => handleSaveRecipe(recipe._id)}
-                      color="yellow"
-                      size={20}
-                    />
-                  ) : (
-                    <>
-                      <FaRegBookmark
-                        onClick={() => handleSaveRecipe(recipe._id)}
-                        size={20}
-                      />
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-            <h3 className="mt-4 text-lg font-semibold">{recipe.title}</h3>
-            <p className="text-sm">{recipe.description}</p>
-            <div className="flex flex-row items-center space-x-1">
-              <MemoizedLikes likes={recipe.likes.length} />
-            </div>
-            <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
-              <div className="flex flex-row space-x-2 items-center">
-                {isLiked[recipe._id] ? (
-                  <FaHeart
-                    onClick={() => handleLikeRecipe(recipe._id)}
-                    color="red"
-                    size={20}
-                  />
-                ) : (
-                  <>
-                    <FaRegHeart
-                      onClick={() => handleLikeRecipe(recipe._id)}
-                      size={20}
-                    />
-                    <p className="text-sm">Like</p>
-                  </>
-                )}
-              </div>
-
-              <div className="flex flex-row space-x-2 items-center">
-                <FaComment size={20} />
-                <p className="text-sm">Comment</p>
-              </div>
-
-              <div className="flex flex-row space-x-2 items-center">
-                <FaShare size={20} />
-                <p className="text-sm">Share</p>
-              </div>
-            </div>
-          </div>
-        ))
-      ) : (
-        <p>No Saved recipes found.</p>
-      )
-    ) : (
-      <p>Loading user data...</p>
-    )}
-  </div>
-  </TabsContent>
-));
-
-const MemoizedRecipeLists = memo(({ recipes, handleLikeRecipe, isLiked, handleSaveRecipe, isSaved }) => (
-  <TabsContent value="recipes" className="">
-    <div className="flex justify-end items-end w-full pb-4">
-      <AddRecipeButton />
-    </div>
-    <div className="space-y-4">
-      {recipes.length > 0 ? (
-        recipes.map((recipe) => (
-          <div
-            className="w-full border border-gray-200 px-4 py-2 rounded-md bg-gray-50"
-            key={recipe._id}
-          >
-            <div className="flex flex-row space-x-2">
-              <div className="p-6 bg-gray-200 rounded-full" />
-              <div className="flex justify-between w-full flex-row">
-                <div>
-                  <p className="text-sm font-medium">
-                    {recipe.createdBy?.name || "Unknown"}
-                  </p>
-                  <p className="text-xs">{timeSince(recipe?.createdOn)}</p>
-                </div>
-                <div className="flex flex-row space-x-2 items-center">
-                  {isSaved[recipe._id] ? (
-                    <FaBookmark
-                      onClick={() => handleSaveRecipe(recipe._id)}
-                      color="yellow"
-                      size={20}
-                    />
-                  ) : (
-                    <>
-                      <FaRegBookmark
-                        onClick={() => handleSaveRecipe(recipe._id)}
-                        size={20}
-                      />
-                    </>
-                  )}
-
-                  <RecipesMenubar recipeId={recipe._id} />
-                </div>
-              </div>
-            </div>
-            <div className="px-2 py-4">
-              <p className="text-lg font-medium">{recipe.title}</p>
-              <p className="text-sm">{recipe.description}</p>
-              <div>
-                <h3 className="text-md font-medium">Ingredients</h3>
-                <ul className="text-sm">
-                  {Array.isArray(recipe.ingredients) &&
-                    recipe.ingredients.map((ingredient, index) => (
-                      <li key={index}>{ingredient.name}</li>
-                    ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-medium text-md">Instructions</h3>
-                <ol>
-                  {Array.isArray(recipe.instructions) &&
-                    recipe.instructions.map((instruction, index) => (
-                      <li key={index} className="text-sm">
-                        Step {index + 1}: {instruction.name}
-                      </li>
-                    ))}
-                </ol>
-              </div>
-              <div>
-                <ol className="flex flex-row space-x-2 pt-2">
-                  {Array.isArray(recipe.tags) &&
-                    recipe.tags.map((tags, index) => (
-                      <li
-                        key={index}
-                        className="text-[10px] font-medium bg-gray-200 px-2 rounded-md"
-                      >
-                        {tags}
-                      </li>
-                    ))}
-                </ol>
-              </div>
-            </div>
-            <div className="flex flex-row items-center space-x-1">
-              <MemoizedLikes likes={recipe.likes.length} />
-            </div>
-            <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
-              <div className="flex flex-row space-x-2 items-center">
-                {isLiked[recipe._id] ? (
-                  <FaHeart
-                    onClick={() => handleLikeRecipe(recipe._id)}
-                    color="red"
-                    size={20}
-                  />
-                ) : (
-                  <>
-                    <FaRegHeart
-                      onClick={() => handleLikeRecipe(recipe._id)}
-                      size={20}
-                    />
-                    <p className="text-sm">Like</p>
-                  </>
-                )}
-              </div>
-
-              <div className="flex flex-row space-x-2 items-center">
-                <FaComment size={20} />
-                <p className="text-sm">Comment</p>
-              </div>
-
-              <div className="flex flex-row space-x-2 items-center">
-                <FaShare size={20} />
-                <p className="text-sm">Share</p>
-              </div>
-            </div>
-          </div>
-        ))
-      ) : (
-        <p>No recipes found.</p>
-      )}
-    </div>
-  </TabsContent>
-));
 
 export default function Profile() {
   const [date, setDate] = useState(new Date());
@@ -398,94 +404,95 @@ export default function Profile() {
     }
   };
 
-    const handleSaveRecipe = async (id) => {
-      const token = localStorage.getItem("authToken");
-      const userIdToUse = jwtDecode(token)?.userId;
-      try {
-        const response = isSaved[id]
-          ? await axios.put(UnsaveRecipeAPI(id), { userId: userIdToUse })
-          : await axios.put(saveRecipeAPI(id), { userId: userIdToUse });
+  const handleSaveRecipe = async (id) => {
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
+    try {
+      const response = isSaved[id]
+        ? await axios.put(UnsaveRecipeAPI(id), { userId: userIdToUse })
+        : await axios.put(saveRecipeAPI(id), { userId: userIdToUse });
 
-        if (response.status === 200) {
-          const updatedIsSaved = { ...isSaved, [id]: !isSaved[id] };
-          localStorage.setItem("isSaved", JSON.stringify(updatedIsSaved));
+      if (response.status === 200) {
+        const updatedIsSaved = { ...isSaved, [id]: !isSaved[id] };
+        localStorage.setItem("isSaved", JSON.stringify(updatedIsSaved));
 
-          setIsSaved(updatedIsSaved);
-          fetchRecipe(userIdToUse, token)
-          fetchUserData(userIdToUse, token);
-        }
-      } catch (error) {
-        console.error("Error handling like/unlike recipe:", error);
-      }
-    };
-    useEffect(() => {
-      const storedIsSaved = JSON.parse(localStorage.getItem("isSaved")) || {};
-      setIsSaved(storedIsSaved);
-    }, []);
-
-    const handleLikeRecipe = async (id) => {
-      const token = localStorage.getItem("authToken");
-      const userIdToUse = jwtDecode(token)?.userId;
-
-      if (!userIdToUse) {
-        console.error("No user ID found.");
-        return;
-      }
-
-      try {
-        const response = isLiked[id]
-          ? await axios.put(UnLikeRecipeAPI(id), { userId: userIdToUse })
-          : await axios.put(LikeRecipeAPI(id), { userId: userIdToUse });
-
-        if (response.status === 200) {
-          const updatedIsLiked = { ...isLiked, [id]: !isLiked[id] };
-          localStorage.setItem("isLiked", JSON.stringify(updatedIsLiked));
-          setIsLiked(updatedIsLiked);
-fetchRecipe(userIdToUse, token)
-          fetchUserData(userIdToUse, token);
-        }
-      } catch (error) {
-        console.error("Error handling like/unlike recipe:", error);
-      }
-    };
-
-    useEffect(() => {
-      const storedIsLiked = JSON.parse(localStorage.getItem("isLiked")) || {};
-      setIsLiked(storedIsLiked);
-    }, []);
-
-    useEffect(() => {
-      const token = localStorage.getItem("authToken");
-      const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
-
-      if (!token) {
-        console.log("No token found");
-        return;
-      }
-
-      try {
-        const decodedToken = jwtDecode(token);
-        const userId = decodedToken?.userId;
-        const userIdToUse = userId || storedGoogleUser?._id;
-
-        if (!userIdToUse) {
-          console.warn(
-            "No valid user ID found (neither decoded token nor Google User)."
-          );
-          return;
-        }
-
+        setIsSaved(updatedIsSaved);
         fetchRecipe(userIdToUse, token);
         fetchUserData(userIdToUse, token);
-      } catch (error) {
-        console.error("Error decoding token:", error.message);
       }
-    }, []);
+    } catch (error) {
+      console.error("Error handling like/unlike recipe:", error);
+    }
+  };
+  useEffect(() => {
+    const storedIsSaved = JSON.parse(localStorage.getItem("isSaved")) || {};
+    setIsSaved(storedIsSaved);
+  }, []);
+
+  const handleLikeRecipe = async (id) => {
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
+
+    if (!userIdToUse) {
+      console.error("No user ID found.");
+      return;
+    }
+
+    try {
+      const response = isLiked[id]
+        ? await axios.put(UnLikeRecipeAPI(id), { userId: userIdToUse })
+        : await axios.put(LikeRecipeAPI(id), { userId: userIdToUse });
+
+      if (response.status === 200) {
+        const updatedIsLiked = { ...isLiked, [id]: !isLiked[id] };
+        localStorage.setItem("isLiked", JSON.stringify(updatedIsLiked));
+        setIsLiked(updatedIsLiked);
+        fetchRecipe(userIdToUse, token);
+        fetchUserData(userIdToUse, token);
+      }
+    } catch (error) {
+      console.error("Error handling like/unlike recipe:", error);
+    }
+  };
+
+  useEffect(() => {
+    const storedIsLiked = JSON.parse(localStorage.getItem("isLiked")) || {};
+    setIsLiked(storedIsLiked);
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
+
+    if (!token) {
+      console.log("No token found");
+      return;
+    }
+
+    try {
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken?.userId;
+      const userIdToUse = userId || storedGoogleUser?._id;
+
+      if (!userIdToUse) {
+        console.warn(
+          "No valid user ID found (neither decoded token nor Google User)."
+        );
+        return;
+      }
+
+      fetchRecipe(userIdToUse, token);
+      fetchUserData(userIdToUse, token);
+    } catch (error) {
+      console.error("Error decoding token:", error.message);
+    }
+  }, []);
 
   const totalLikes = recipe.reduce(
     (sum, recipe) => sum + (recipe.likes?.length || 0),
     0
   );
+
   const sortedRecipes = [...recipe].sort(
     (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
   );
@@ -498,8 +505,8 @@ fetchRecipe(userIdToUse, token)
           <MemoizedUsername name={userData?.name} />
         </div>
         <div className="flex flex-row space-x-20 px-6">
-          <h3>{userData?.following || 0} Following</h3>
-          <h3>{userData?.followers || 0} Followers</h3>
+          <h3>{userData?.following.length || 0} Following</h3>
+          <h3>{userData?.followers.length || 0} Followers</h3>
           <h3>{totalLikes} Likes</h3>
         </div>
       </div>
@@ -533,20 +540,20 @@ fetchRecipe(userIdToUse, token)
             handleSaveRecipe={handleSaveRecipe}
           />
 
-            <MemoizedSavedRecipes
-              userData={userData}
-              isLiked={isLiked}
-              handleLikeRecipe={handleLikeRecipe}
-              isSaved={isSaved}
-              handleSaveRecipe={handleSaveRecipe}
-            />
-            <MemoizedLikedRecipes
-              userData={userData}
-              isLiked={isLiked}
-              handleLikeRecipe={handleLikeRecipe}
-              isSaved={isSaved}
-              handleSaveRecipe={handleSaveRecipe}
-            />
+          <MemoizedSavedRecipes
+            userData={userData}
+            isLiked={isLiked}
+            handleLikeRecipe={handleLikeRecipe}
+            isSaved={isSaved}
+            handleSaveRecipe={handleSaveRecipe}
+          />
+          <MemoizedLikedRecipes
+            userData={userData}
+            isLiked={isLiked}
+            handleLikeRecipe={handleLikeRecipe}
+            isSaved={isSaved}
+            handleSaveRecipe={handleSaveRecipe}
+          />
         </Tabs>
       </div>
     </div>

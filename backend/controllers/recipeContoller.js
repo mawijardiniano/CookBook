@@ -75,6 +75,21 @@ const getRecipes = async (req, res) => {
   }
 };
 
+const editRecipe = async (req, res) => {
+  const { id } = req.params;
+  const { title, description, ingredients, instructions, tags } = req.body;
+  try {
+    const updatedRecipe = await Recipe.findByIdAndUpdate(
+      id,
+      { title, description, ingredients, instructions, tags },
+      { new: true }
+    );
+    res.status(200).json(updatedRecipe);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
 const deleteRecipe = async (req, res) => {
   try {
     const { id } = req.params;
@@ -205,4 +220,4 @@ const unSaveRecipe = async (req, res) => {
 };
 
 
-module.exports = { createRecipe, getRecipes, getRecipeByUser, deleteRecipe,likeRecipe,unlikeRecipe, saveRecipe, unSaveRecipe };
+module.exports = { createRecipe, getRecipes, getRecipeByUser, deleteRecipe,likeRecipe,unlikeRecipe, saveRecipe, unSaveRecipe, editRecipe };
