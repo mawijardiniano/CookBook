@@ -145,7 +145,9 @@ const getUserLoggedin = async (req, res) => {
           path: "createdBy",
           model: "User",
         },
-      });
+      })
+      .populate("following")
+      .populate("followers");;
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -195,7 +197,7 @@ const FollowUser = async (req, res) => {
     console.log("Request params:", req.params);
     console.log("Authenticated user ID:", req.user.userId);
 
-    const { userId } = req.params; 
+    const { userId } = req.params;
     const currentUserId = req.user.userId;
 
     if (userId === currentUserId) {
@@ -231,12 +233,11 @@ const FollowUser = async (req, res) => {
     });
   } catch (error) {
     console.error("FollowUser Error:", error);
-    res.status(500).json({ message: "An error occurred while following the user." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while following the user." });
   }
 };
-
-
-
 
 module.exports = {
   userLogin,
@@ -245,5 +246,5 @@ module.exports = {
   getAllUsers,
   googleLogin,
   editUsername,
-  FollowUser
+  FollowUser,
 };

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { FaBell, FaBookReader } from "react-icons/fa";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import FollowingTab from "../components/followingTab";
 
 export default function Followings() {
   const [date, setDate] = useState(new Date());
@@ -13,14 +14,12 @@ export default function Followings() {
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full">
-
+      <div className="flex h-screen w-full px-6">
         <div className="flex-1 flex flex-col">
-
-          <div className="p-6">
-            <p>Following</p>
+          <div className="py-24 justify-center flex-1 flex"> 
+           <FollowingTab/>
           </div>
-        </div>
+        </div> 
       </div>
     </SidebarProvider>
   );

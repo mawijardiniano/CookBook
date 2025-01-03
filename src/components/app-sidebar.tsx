@@ -8,8 +8,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Home, Heart, Users, User } from "lucide-react";
-import { FaBookReader } from "react-icons/fa";
+import { Home, Heart, Users, User, CogIcon } from "lucide-react";
+import { FaBookReader, FaCogs } from "react-icons/fa";
 import { NavLink, useLocation } from "react-router-dom";
 
 const items = [
@@ -17,11 +17,6 @@ const items = [
     title: "Home",
     url: "/home",
     icon: Home,
-  },
-  {
-    title: "Saved Recipes",
-    url: "/savedRecipes",
-    icon: Heart,
   },
   {
     title: "Followings",
@@ -32,6 +27,11 @@ const items = [
     title: "Profile",
     url: "/profile",
     icon: User,
+  },
+  {
+    title: "Settings",
+    url: "/settings",
+    icon: CogIcon,
   },
 ];
 

@@ -35,6 +35,8 @@ const MemoizedLikes = memo(({ likes }) => {
   );
 });
 
+const MemoizedAddRecipeButton = memo(() => <AddRecipeButton />);
+
 const timeSince = (date) => {
   const now = new Date();
   const seconds = Math.floor((now - new Date(date)) / 1000);
@@ -235,7 +237,7 @@ const MemoizedRecipeLists = memo(
   ({ recipes, handleLikeRecipe, isLiked, handleSaveRecipe, isSaved }) => (
     <TabsContent value="recipes" className="">
       <div className="flex justify-end items-end w-full pb-4">
-        <AddRecipeButton />
+        <MemoizedAddRecipeButton />
       </div>
       <div className="space-y-4">
         {recipes.length > 0 ? (
