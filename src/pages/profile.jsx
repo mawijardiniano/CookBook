@@ -506,10 +506,10 @@ export default function Profile() {
           <div className="p-16 rounded-full bg-gray-200"></div>
           <MemoizedUsername name={userData?.name} />
         </div>
-        <div className="flex flex-row space-x-20 px-6">
-          <h3>{userData?.following.length || 0} Following</h3>
-          <h3>{userData?.followers.length || 0} Followers</h3>
-          <h3>{totalLikes} Likes</h3>
+        <div className="flex flex-row space-x-12 px-6">
+          <h3 className="text-gray-500 font-medium">{userData?.following.length || 0} Following</h3>
+          <h3 className="text-gray-500 font-medium">{userData?.followers.length || 0} Followers</h3>
+          <h3 className="text-gray-500 font-medium">{totalLikes || 0} Likes</h3>
         </div>
       </div>
       <div className="px-6 py-10">
