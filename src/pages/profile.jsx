@@ -15,8 +15,6 @@ import AddRecipeButton from "../components/addRecipeButton";
 import EditProfileButton from "../components/editProfileButton";
 import { RecipesMenubar } from "../components/recipesMenubar";
 
-
-
 const MemoizedUsername = memo(({ name }) => {
   return (
     <div className="flex flex-col justify-center space-y-2">
@@ -382,7 +380,10 @@ export default function Profile() {
       const response = await axios.get(RECIPEbyUSER_API(userIdToUse), {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setRecipe(response.data);
+      if (JSON.stringify(response.data) !== JSON.stringify(recipe)) {
+        localStorage.setItem("recipes", JSON.stringify(response.data));
+        setRecipe(response.data);
+      }
     } catch (error) {
       console.error(
         "Error fetching recipe data:",
@@ -396,8 +397,10 @@ export default function Profile() {
       const response = await axios.get(LOGGEDUSER_API(userIdToUse), {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setUserData(response.data);
-      console.log("Saved recipes:", response.data.savedRecipes);
+      if (JSON.stringify(response.data) !== JSON.stringify(userData)) {
+        localStorage.setItem("userData", JSON.stringify(response.data));
+        setUserData(response.data);
+      }
     } catch (error) {
       console.error(
         "Error fetching user data:",
@@ -482,9 +485,18 @@ export default function Profile() {
         );
         return;
       }
-
-      fetchRecipe(userIdToUse, token);
-      fetchUserData(userIdToUse, token);
+      const cachedUserData = JSON.parse(localStorage.getItem("userData"));
+      if (cachedUserData) {
+        setUserData(cachedUserData);
+      } else {
+        fetchUserData(userIdToUse, token);
+      }
+      const cachedRecipes = JSON.parse(localStorage.getItem("recipes"));
+      if (cachedRecipes) {
+        setRecipe(cachedRecipes);
+      } else {
+        fetchRecipe(userIdToUse, token);
+      }
     } catch (error) {
       console.error("Error decoding token:", error.message);
     }
@@ -504,11 +516,15 @@ export default function Profile() {
       <div className="flex-1 flex flex-col">
         <div className="p-6 flex flex-row space-x-6">
           <div className="p-16 rounded-full bg-gray-200"></div>
-          <MemoizedUsername name={userData?.name} />
+          {userData?.name && <MemoizedUsername name={userData.name} />}
         </div>
         <div className="flex flex-row space-x-12 px-6">
-          <h3 className="text-gray-500 font-medium">{userData?.following.length || 0} Following</h3>
-          <h3 className="text-gray-500 font-medium">{userData?.followers.length || 0} Followers</h3>
+          <h3 className="text-gray-500 font-medium">
+            {userData?.following.length || 0} Following
+          </h3>
+          <h3 className="text-gray-500 font-medium">
+            {userData?.followers.length || 0} Followers
+          </h3>
           <h3 className="text-gray-500 font-medium">{totalLikes || 0} Likes</h3>
         </div>
       </div>
