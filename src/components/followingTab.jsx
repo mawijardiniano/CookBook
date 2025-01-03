@@ -9,12 +9,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { Button } from "@/components/ui/button";
 
-const FollowingList = memo(({ userData, unfollowUser, followUser }) => (
+
+const FollowingList = memo(({ userData, unfollowUser, followUser, handleViewProfile }) => (
   <TabsContent className="flex w-full py-1" value="followings">
     {userData?.following?.map((followings) => (
       <div
@@ -31,39 +32,49 @@ const FollowingList = memo(({ userData, unfollowUser, followUser }) => (
             followings={followings}
             unfollowUser={unfollowUser}
           />
-          <Button className="text-xs border">View Profile</Button>
+          <Button className="text-xs border" onClick={() => handleViewProfile(followings._id)}>View Profile</Button>
         </div>
       </div>
     ))}
   </TabsContent>
 ));
 
-const FollowersList = memo (({userData, followUser}) => (
+const FollowersList = memo(({ userData, followUser }) => {
+  const isFriend = (followerId) =>
+    userData?.following?.some((following) => following._id === followerId);
+
+  return (
     <TabsContent className="flex w-full" value="followers">
-        {userData?.followers?.map((follower) => (
-          <div
-            key={follower._id}
-            className="flex items-center justify-between p-2 w-full border rounded-md"
-          >
-            <div className="flex items-center">
-              <div className="ml-4">
-                <h3 className="font-semibold">{follower?.name}</h3>
-              </div>
+      {userData?.followers?.map((follower) => (
+        <div
+          key={follower._id}
+          className="flex items-center justify-between p-2 w-full border rounded-md"
+        >
+          <div className="flex items-center">
+            <div className="ml-4">
+              <h3 className="font-semibold">{follower?.name}</h3>
             </div>
-            <div className="space-x-2">
+          </div>
+          <div className="space-x-2">
+            {!isFriend(follower._id) ? (
               <Button
                 className="text-xs"
                 style={{ backgroundColor: "black", color: "white" }}
                 onClick={() => followUser(follower._id)}
               >
-                Followback
+                Follow Back
               </Button>
-              <Button className="text-xs border">View Profile</Button>
-            </div>
+            ) : (
+                <span className="bg-gray-200 py-1 px-3 text-sm font-medium rounded-md">Friends</span>
+            )}
+            <Button className="text-xs border">View Profile</Button>
           </div>
-        ))}
-      </TabsContent>
-));
+        </div>
+      ))}
+    </TabsContent>
+  );
+});
+
 
 const FollowingListButtons = memo(({ followings, unfollowUser }) => (
   <Dialog>
@@ -91,6 +102,7 @@ const FollowingListButtons = memo(({ followings, unfollowUser }) => (
 ));
 
 const FollowingTab = () => {
+const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [followings, setFollowings] = useState([]);
 
@@ -159,6 +171,9 @@ useEffect(() => {
   setFollowings(storedFollowings);
 }, []);
 
+const handleViewProfile = (userId) => {
+  navigate(`/userprofile/${userId}`);
+};
 
 
   const fetchUserData = async (userIdToUse, token) => {
@@ -216,7 +231,7 @@ useEffect(() => {
           Followers
         </TabsTrigger>
       </TabsList>
-      <FollowingList userData={userData} unfollowUser={unfollowUser} followUser={followUser}/>
+      <FollowingList userData={userData} unfollowUser={unfollowUser} followUser={followUser} handleViewProfile={handleViewProfile}/>
       <FollowersList userData={userData} followUser={followUser}/>
     </Tabs>
   );

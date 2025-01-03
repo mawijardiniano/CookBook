@@ -10,6 +10,7 @@ import Profile from "./pages/profile";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Navbar from "./components/navbar";
+import UsersProfile from "./pages/usersProfile";
 import PrivateRoute from "./pages/PrivateRoute";
 
 function MainApp() {
@@ -63,6 +64,14 @@ function MainApp() {
                 element={
                   <PrivateRoute>
                     <Profile />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/userprofile"
+                element={
+                  <PrivateRoute>
+                    <UsersProfile />
                   </PrivateRoute>
                 }
               />
