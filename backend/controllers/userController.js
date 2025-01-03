@@ -147,7 +147,7 @@ const getUserLoggedin = async (req, res) => {
         },
       })
       .populate("following")
-      .populate("followers");;
+      .populate("followers");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -239,6 +239,41 @@ const FollowUser = async (req, res) => {
   }
 };
 
+const UnFollow = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const currentUserId = req.user.userId;
+
+    if (userId === currentUserId) {
+      return res.status(400).json({ message: "You cannot follow yourself." });
+    }
+
+    const targetUser = await User.findById(userId);
+    if (!targetUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      currentUserId,
+      { $pull: { following: userId } },
+      { new: true }
+    ).populate("following", "name email");
+
+    console.log("Updated authenticated user:", updatedUser);
+
+    return res.status(200).json({
+      message: "User unfollowed successfully.",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("FollowUser Error:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while following the user." });
+
+  }
+}
+
 module.exports = {
   userLogin,
   userSignup,
@@ -247,4 +282,5 @@ module.exports = {
   googleLogin,
   editUsername,
   FollowUser,
+  UnFollow,
 };

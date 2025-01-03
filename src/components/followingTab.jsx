@@ -6,8 +6,47 @@ import { Button } from "@/components/ui/button";
 
 const FollowingTab = () => {
   const [userData, setUserData] = useState(null);
+  const [followings, setFollowings] = useState([]);
 
   const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
+  const UNFOLLOW_API = (id) => `http://localhost:5000/api/user/unfollow/${id}`;
+  const FOLLOW = (id) => `http://localhost:5000/api/user/follow/${id}`;
+
+  const unfollowUser = async (id) => {
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
+    try {
+      const response = await axios.post(
+        UNFOLLOW_API(id),
+        { userId: userIdToUse },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("User unfollowed", response.data);
+      setFollowings((prevFollowings) =>
+        prevFollowings.filter((following) => following._id !== id)
+      );
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+    }
+  };
+
+  const followUser = async (id) => {
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
+    try {
+      const response = await axios.post(
+        FOLLOW(id),
+        { userId: userIdToUse },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("User followed", response.data);
+      setFollowings(response.data);
+    } catch (error) {}
+  };
 
   const fetchUserData = async (userIdToUse, token) => {
     try {
@@ -15,7 +54,8 @@ const FollowingTab = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserData(response.data);
-      console.log("Saved recipes:", response.data.following);
+      setFollowings(response.data.following);
+      console.log("following:", followings);
     } catch (error) {
       console.error(
         "Error fetching user data:",
@@ -23,6 +63,7 @@ const FollowingTab = () => {
       );
     }
   };
+
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
@@ -74,7 +115,13 @@ const FollowingTab = () => {
               </div>
             </div>
             <div className="space-x-2">
-              <Button className="text-xs" style={{backgroundColor: "black", color: "white"}}>Unfollow</Button>
+              <Button
+                className="text-xs"
+                style={{ backgroundColor: "black", color: "white" }}
+                onClick={() => unfollowUser(followings._id)}
+              >
+                Unfollow
+              </Button>
               <Button className="text-xs border">View Profile</Button>
             </div>
           </div>
@@ -92,8 +139,14 @@ const FollowingTab = () => {
               </div>
             </div>
             <div className="space-x-2">
-              <Button className="text-xs" style={{backgroundColor: "black", color: "white"}}>Followback</Button>
-              <Button className="text-xs border" >View Profile</Button>
+              <Button
+                className="text-xs"
+                style={{ backgroundColor: "black", color: "white" }}
+                onClick={() => followUser(follower._id)}
+              >
+                Followback
+              </Button>
+              <Button className="text-xs border">View Profile</Button>
             </div>
           </div>
         ))}
