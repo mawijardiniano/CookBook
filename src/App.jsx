@@ -68,7 +68,7 @@ function MainApp() {
                 }
               />
               <Route
-                path="/userprofile"
+                path="/userprofile/:userId"
                 element={
                   <PrivateRoute>
                     <UsersProfile />
