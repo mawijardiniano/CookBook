@@ -22,6 +22,7 @@ import {
 } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { jwtDecode } from "jwt-decode";
 
 const ProfileComponent = ({
   userData,
@@ -54,6 +55,7 @@ const ProfileComponent = ({
     </div>
   );
 };
+
 
 const UsernameProfile = memo(({ userData }) => <p>{userData?.name}</p>);
 
@@ -88,33 +90,79 @@ const timeSince = (date) => {
   }
   return "Just now";
 };
+const Buttons = memo(({ followUser }) => {
+  const token = localStorage.getItem("authToken");
+  const loggedUserId = token ? jwtDecode(token)?.userId : null;
+  const { userId } = useParams();
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-const Buttons = memo(({}) => (
-  <div className="flex space-x-4">
-    <Button
-      style={{ backgroundColor: "black" }}
-      className=" text-white text-sm px-2 rounded-md"
-    >
-      Follow
-    </Button>
-    <Button
-      style={{ backgroundColor: "black" }}
-      className=" text-white text-sm px-3  rounded-md"
-    >
-      Message
-    </Button>
-    <Menubar className="border ">
-      <MenubarMenu>
-        <MenubarTrigger>
-          <FaCog />
-        </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem>Unfollow</MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-    </Menubar>
-  </div>
-));
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/user/profile/${userId}`);
+        setUserData(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        setLoading(false);
+      }
+    };
+
+    if (userId) {
+      fetchUserData();
+    }
+  }, [userId]);
+
+  const isFollowing = userData?.following?.includes(loggedUserId);  
+  const isFollowedBack = userData?.followers?.includes(loggedUserId);
+
+  const isFriend = isFollowing && isFollowedBack;
+
+  return (
+    <div className="flex space-x-4">
+         {isFriend ? (
+        <span className="bg-gray-200 py-1 px-3 text-sm font-medium rounded-md">
+          Friends
+        </span>
+      ) : !isFollowing ? (
+        <Button
+          className="text-xs"
+          style={{ backgroundColor: "black", color: "white" }}
+          onClick={() => followUser?.(userData._id)}
+        >
+          Follow Back
+        </Button>
+      ) : (
+        <span className="bg-gray-200 py-1 px-3 text-sm font-medium rounded-md">
+          Following
+        </span>
+      )}
+
+      <Button
+        style={{ backgroundColor: "black" }}
+        className="text-white text-sm px-3 rounded-md"
+      >
+        Message
+      </Button>
+
+      <Menubar className="border">
+        <MenubarMenu>
+          <MenubarTrigger>
+            <FaCog />
+          </MenubarTrigger>
+          <MenubarContent>
+            <MenubarItem>Unfollow</MenubarItem>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+    </div>
+  );
+});
+
+
+
+
 
 const MemoizedRecipeLists = memo(
   ({ recipes, handleLikeRecipe, isLiked, handleSaveRecipe, isSaved }) => (
@@ -313,6 +361,7 @@ const UsersProfile = () => {
   const handleLikeRecipe = async (id) => {
     const token = localStorage.getItem("authToken");
     const userIdToUse = jwtDecode(token)?.userId;
+    console.log("Logged User ID to use:", userIdToUse);
 
     if (!userIdToUse) {
       console.error("No user ID found.");
@@ -342,6 +391,7 @@ const UsersProfile = () => {
   }, []);
 
   useEffect(() => {
+    
     if (userId) {
       console.log("Using User ID:", userId);
       fetchUserData(userId);

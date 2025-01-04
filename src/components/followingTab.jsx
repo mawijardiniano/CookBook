@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 
 
 const FollowingList = memo(({ userData, unfollowUser, followUser, handleViewProfile }) => (
-  <TabsContent className="flex w-full py-1" value="followings">
+  <TabsContent className="flex w-full flex-col space-y-2" value="followings">
     {userData?.following?.map((followings) => (
       <div
         key={followings._id}
@@ -39,7 +39,7 @@ const FollowingList = memo(({ userData, unfollowUser, followUser, handleViewProf
   </TabsContent>
 ));
 
-const FollowersList = memo(({ userData, followUser }) => {
+const FollowersList = memo(({ userData, followUser, handleViewProfile }) => {
   const isFriend = (followerId) =>
     userData?.following?.some((following) => following._id === followerId);
 
@@ -67,7 +67,7 @@ const FollowersList = memo(({ userData, followUser }) => {
             ) : (
                 <span className="bg-gray-200 py-1 px-3 text-sm font-medium rounded-md">Friends</span>
             )}
-            <Button className="text-xs border">View Profile</Button>
+            <Button className="text-xs border" onClick={() => handleViewProfile(follower._id)}>View Profile</Button>
           </div>
         </div>
       ))}
@@ -238,7 +238,7 @@ const handleViewProfile = (userId) => {
         </TabsTrigger>
       </TabsList>
       <FollowingList userData={userData} unfollowUser={unfollowUser} followUser={followUser} handleViewProfile={handleViewProfile}/>
-      <FollowersList userData={userData} followUser={followUser}/>
+      <FollowersList userData={userData} followUser={followUser} handleViewProfile={handleViewProfile}/>
     </Tabs>
   );
 };
