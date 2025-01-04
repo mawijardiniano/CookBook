@@ -44,7 +44,7 @@ const FollowersList = memo(({ userData, followUser }) => {
     userData?.following?.some((following) => following._id === followerId);
 
   return (
-    <TabsContent className="flex w-full" value="followers">
+    <TabsContent className="flex w-full flex-col space-y-2" value="followers">
       {userData?.followers?.map((follower) => (
         <div
           key={follower._id}

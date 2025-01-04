@@ -149,8 +149,10 @@ const AddRecipeButton = () => {
         ...recipeFormData,
         createdBy: userId,
       });
+      localStorage.setItem("recipes", JSON.stringify(response.data));
       console.log("Recipe added successfully:", response);
-
+      navigate("/profile");
+      window.location.reload();
     } catch (error) {
       console.error("Error adding recipe:", error?.response?.data || error.message);
     }

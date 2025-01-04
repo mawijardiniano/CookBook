@@ -27,20 +27,33 @@ const timeSince = (date) => {
 const createRecipe = async (req, res) => {
   const { title, description, ingredients, instructions, tags } = req.body;
   const userId = req.params.id;
+
   try {
+    if (!title || !description || !ingredients || !instructions) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+
     const recipe = new Recipe({
       title,
       description,
       ingredients,
       instructions,
-      tags,
+      tags, 
       createdBy: userId,
     });
 
     await recipe.save();
+
+
     res.status(201).json(recipe);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 

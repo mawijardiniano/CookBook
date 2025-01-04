@@ -74,7 +74,7 @@ export function NameMenubar() {
 
     localStorage.removeItem("authToken");
     localStorage.removeItem("googleUser");
-
+    localStorage.removeItem("userData");
     navigate("/");
   };
 

@@ -128,6 +128,22 @@ const getAllUsers = async (req, res) => {
   } catch (error) {}
 };
 
+const getUserProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 const getUserLoggedin = async (req, res) => {
   try {
     const { userId } = req.user;
@@ -270,14 +286,14 @@ const UnFollow = async (req, res) => {
     res
       .status(500)
       .json({ message: "An error occurred while following the user." });
-
   }
-}
+};
 
 module.exports = {
   userLogin,
   userSignup,
   getUserLoggedin,
+  getUserProfile,
   getAllUsers,
   googleLogin,
   editUsername,
