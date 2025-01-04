@@ -355,13 +355,9 @@ const MemoizedRecipeLists = memo(
 );
 
 export default function Profile() {
-  const [date, setDate] = useState(new Date());
-  const [query, setQuery] = useState("");
   const [userData, setUserData] = useState(null);
   const [googleUser, setGoogleUser] = useState(null);
   const [recipe, setRecipe] = useState([]);
-  const [following, setFollowing] = useState(30);
-  const [followers, setFollowers] = useState(100);
   const [isLiked, setIsLiked] = useState({});
   const [isSaved, setIsSaved] = useState({});
 
@@ -396,6 +392,7 @@ export default function Profile() {
       const response = await axios.get(LOGGEDUSER_API(userIdToUse), {
         headers: { Authorization: `Bearer ${token}` },
       });
+      localStorage.setItem("userData", JSON.stringify(response.data));
       setUserData(response.data);
       console.log("Saved recipes:", response.data.savedRecipes);
     } catch (error) {
@@ -482,9 +479,16 @@ export default function Profile() {
         );
         return;
       }
+      const cachedUserData = JSON.parse(localStorage.getItem("userData"));
+      if (cachedUserData) {
+        setUserData(cachedUserData);
+        console.log("Loaded user data from cache:", cachedUserData);
+        fetchUserData(userIdToUse, token);
+      } else {
+        fetchUserData(userIdToUse, token);
+      }
 
       fetchRecipe(userIdToUse, token);
-      fetchUserData(userIdToUse, token);
     } catch (error) {
       console.error("Error decoding token:", error.message);
     }
@@ -507,8 +511,8 @@ export default function Profile() {
           <MemoizedUsername name={userData?.name} />
         </div>
         <div className="flex flex-row space-x-12 px-6">
-          <h3 className="text-gray-500 font-medium">{userData?.following.length || 0} Following</h3>
-          <h3 className="text-gray-500 font-medium">{userData?.followers.length || 0} Followers</h3>
+          <h3 className="text-gray-500 font-medium">{userData?.following?.length || 0} Following</h3>
+          <h3 className="text-gray-500 font-medium">{userData?.followers?.length || 0} Followers</h3>
           <h3 className="text-gray-500 font-medium">{totalLikes || 0} Likes</h3>
         </div>
       </div>

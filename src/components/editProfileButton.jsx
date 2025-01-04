@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback, memo } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -52,7 +52,7 @@ const EditProfileButton = () => {
   const [name, setName] = useState("");
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
-  const EDITUSER_API = (id) => `http://localhost:5000/api/user/edit/${id}`
+  const EDITUSER_API = (id) => `http://localhost:5000/api/user/edit/${id}`;
   const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
 
   const handleNameChange = useCallback((value) => {
@@ -108,32 +108,43 @@ const EditProfileButton = () => {
   }, []);
 
   const handleSave = async () => {
-     const token = localStorage.getItem("authToken");
-        console.log("Retrieved Token:", token);
-    
-        const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
-        console.log("Retrieved Google User:", storedGoogleUser);
-    
-        if (!token) {
-          console.log("No token found");
-          return;
-        }
-        const decodedToken = jwtDecode(token);
-        const userId = decodedToken?.userId;
-        const userIdToUse = userId || storedGoogleUser?._id;
-        console.log("User ID to use:", userIdToUse);
-        try {
-          const response = await axios.put(EDITUSER_API(userIdToUse), {
-            name: name, 
-          });
-          console.log("New username", response);
-          setUserData({ ...userData, name: response.data.name });
-          navigate("/profile");
-          window.location.reload(); 
-        } catch (error) {
-          
-        }
-  }
+    const token = localStorage.getItem("authToken");
+    console.log("Retrieved Token:", token);
+
+    const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
+    console.log("Retrieved Google User:", storedGoogleUser);
+
+    if (!token) {
+      console.log("No token found");
+      return;
+    }
+    const decodedToken = jwtDecode(token);
+    const userId = decodedToken?.userId;
+    const userIdToUse = userId || storedGoogleUser?._id;
+    console.log("User ID to use:", userIdToUse);
+    try {
+      const response = await axios.put(EDITUSER_API(userIdToUse), {
+        name: name,
+      });
+      console.log("New username", response);
+      setUserData({ ...userData, name: response.data.name });
+      localStorage.setItem("userData", JSON.stringify(response.data));
+      navigate("/profile");
+      window.location.reload();
+    } catch (error) {
+      console.error(
+        "Error updating user data:",
+        error?.response?.data || error.message
+      );
+    }
+  };
+  useEffect(() => {
+    const storedUserData = JSON.parse(localStorage.getItem("userData"));
+    if (storedUserData) {
+      setUserData(storedUserData);
+    }
+  }, []);
+  
 
   return (
     <Dialog>
