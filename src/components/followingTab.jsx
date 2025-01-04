@@ -192,25 +192,31 @@ const handleViewProfile = (userId) => {
     }
   };
 
+  //cache the user data and followings
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
-
     if (!token) {
       console.log("No token found");
       return;
     }
-
     try {
       const decodedToken = jwtDecode(token);
       const userId = decodedToken?.userId;
       const userIdToUse = userId || storedGoogleUser?._id;
-
       if (!userIdToUse) {
         console.warn(
           "No valid user ID found (neither decoded token nor Google User)."
         );
         return;
+      }
+      const cachedUserData = JSON.parse(localStorage.getItem("userData"));
+      const cachedFollowings = JSON.parse(localStorage.getItem("followings"));
+      if (cachedUserData && cachedFollowings) {
+        setUserData(cachedUserData);
+        setFollowings(cachedFollowings);
+        console.log("Loaded user data and followings from cache");
+        fetchUserData(userIdToUse, token);
       }
       fetchUserData(userIdToUse, token);
     } catch (error) {
