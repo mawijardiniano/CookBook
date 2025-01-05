@@ -19,6 +19,7 @@ import {
   FaComment,
   FaShare,
   FaRegBookmark,
+  FaUserCog,
 } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -118,16 +119,20 @@ const Buttons = memo(({ followUser }) => {
 
   const isFollowing = userData?.following?.includes(loggedUserId);  
   const isFollowedBack = userData?.followers?.includes(loggedUserId);
-
   const isFriend = isFollowing && isFollowedBack;
-
+  
   return (
     <div className="flex space-x-4">
-         {isFriend ? (
-        <span className="bg-gray-200 py-1 px-3 text-sm font-medium rounded-md">
+      {isFriend ? (
+        <span className="bg-gray-200 py-1 px-3 text-sm font-medium rounded-md justify-center flex items-center">
           Friends
         </span>
-      ) : !isFollowing ? (
+      ) : isFollowedBack ? (
+
+        <span className="bg-gray-200 py-1 px-3 text-sm font-medium rounded-md">
+          Following
+        </span>
+      ) : isFollowing ? (
         <Button
           className="text-xs"
           style={{ backgroundColor: "black", color: "white" }}
@@ -136,10 +141,15 @@ const Buttons = memo(({ followUser }) => {
           Follow Back
         </Button>
       ) : (
-        <span className="bg-gray-200 py-1 px-3 text-sm font-medium rounded-md">
-          Following
-        </span>
+        <Button
+          className="text-xs"
+          style={{ backgroundColor: "black", color: "white" }}
+          onClick={() => followUser?.(userData._id)}
+        >
+          Follow
+        </Button>
       )}
+
 
       <Button
         style={{ backgroundColor: "black" }}
@@ -151,7 +161,7 @@ const Buttons = memo(({ followUser }) => {
       <Menubar className="border">
         <MenubarMenu>
           <MenubarTrigger>
-            <FaCog />
+            <FaUserCog size={16} />
           </MenubarTrigger>
           <MenubarContent>
             <MenubarItem>Unfollow</MenubarItem>
