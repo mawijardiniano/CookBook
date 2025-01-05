@@ -90,6 +90,8 @@ const timeSince = (date) => {
   }
   return "Just now";
 };
+
+//temporarily using this component to test the follow/unfollow functionality
 const Buttons = memo(({ followUser }) => {
   const token = localStorage.getItem("authToken");
   const loggedUserId = token ? jwtDecode(token)?.userId : null;

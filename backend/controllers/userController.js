@@ -269,6 +269,14 @@ const UnFollow = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
+    const updatedTargetUser = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { followers: currentUserId } },
+      { new: true }
+    );
+
+    console.log("Updated target user:", updatedTargetUser);
+
     const updatedUser = await User.findByIdAndUpdate(
       currentUserId,
       { $pull: { following: userId } },
