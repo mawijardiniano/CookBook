@@ -247,7 +247,7 @@ const Home = () => {
 
       if (response.status === 200) {
         const updatedIsLiked = { ...isLiked, [id]: !isLiked[id] };
-        localStorage.setItem("isLiked", JSON.stringify(updatedIsLiked));
+        localStorage.setItem(`isLiked_${userIdToUse}`, JSON.stringify(updatedIsLiked));
 
         setIsLiked(updatedIsLiked);
 
@@ -257,8 +257,9 @@ const Home = () => {
       console.error("Error handling like/unlike recipe:", error);
     }
   };
-  useEffect(() => {
-    const storedIsLiked = JSON.parse(localStorage.getItem("isLiked")) || {};
+  useEffect(() => {    const token = localStorage.getItem("authToken");
+      const userIdToUse = jwtDecode(token)?.userId;
+    const storedIsLiked = JSON.parse(localStorage.getItem(`isLiked_${userIdToUse}`)) || {};
     setIsLiked(storedIsLiked);
 
     getRecipes();
@@ -277,7 +278,7 @@ const Home = () => {
 
       if (response.status === 200) {
         const updatedIsSaved = { ...isSaved, [id]: !isSaved[id] };
-        localStorage.setItem("isSaved", JSON.stringify(updatedIsSaved));
+        localStorage.setItem(`isSaved_${userIdToUse}`, JSON.stringify(updatedIsSaved));
 
         setIsSaved(updatedIsSaved);
 
@@ -288,7 +289,9 @@ const Home = () => {
     }
   };
   useEffect(() => {
-    const storedIsSaved = JSON.parse(localStorage.getItem("isSaved")) || {};
+        const token = localStorage.getItem("authToken");
+        const userIdToUse = jwtDecode(token)?.userId;
+    const storedIsSaved = JSON.parse(localStorage.getItem(`isSaved_${userIdToUse}`)) || {};
     setIsSaved(storedIsSaved);
 
     getRecipes();

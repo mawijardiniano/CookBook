@@ -65,7 +65,7 @@ const FollowersList = memo(({ userData, followUser, handleViewProfile }) => {
                 Follow Back
               </Button>
             ) : (
-                <span className="bg-gray-200 py-1 px-3 text-sm font-medium rounded-md">Friends</span>
+                <span className="bg-gray-200 py-2 px-3 text-sm font-medium rounded-md">Friends</span>
             )}
             <Button className="text-xs border" onClick={() => handleViewProfile(follower._id)}>View Profile</Button>
           </div>

@@ -355,7 +355,7 @@ const UsersProfile = () => {
 
       if (response.status === 200) {
         const updatedIsSaved = { ...isSaved, [id]: !isSaved[id] };
-        localStorage.setItem("isSaved", JSON.stringify(updatedIsSaved));
+        localStorage.setItem(`isSaved_${userIdToUse}`, JSON.stringify(updatedIsSaved));
 
         setIsSaved(updatedIsSaved);
         fetchRecipe(userIdToUse, token);
@@ -366,7 +366,9 @@ const UsersProfile = () => {
     }
   };
   useEffect(() => {
-    const storedIsSaved = JSON.parse(localStorage.getItem("isSaved")) || {};
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
+    const storedIsSaved = JSON.parse(localStorage.getItem(`isSaved_${userIdToUse}`)) || {};
     setIsSaved(storedIsSaved);
   }, []);
 
@@ -387,7 +389,7 @@ const UsersProfile = () => {
 
       if (response.status === 200) {
         const updatedIsLiked = { ...isLiked, [id]: !isLiked[id] };
-        localStorage.setItem("isLiked", JSON.stringify(updatedIsLiked));
+        localStorage.setItem(`isLiked_${userIdToUse}`, JSON.stringify(updatedIsLiked));
         setIsLiked(updatedIsLiked);
         fetchRecipe(userIdToUse, token);
         fetchUserData(userIdToUse, token);
@@ -398,7 +400,9 @@ const UsersProfile = () => {
   };
 
   useEffect(() => {
-    const storedIsLiked = JSON.parse(localStorage.getItem("isLiked")) || {};
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
+    const storedIsLiked = JSON.parse(localStorage.getItem(`isLiked_${userIdToUse}`)) || {};
     setIsLiked(storedIsLiked);
   }, []);
 

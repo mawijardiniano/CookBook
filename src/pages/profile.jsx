@@ -15,8 +15,6 @@ import AddRecipeButton from "../components/addRecipeButton";
 import EditProfileButton from "../components/editProfileButton";
 import { RecipesMenubar } from "../components/recipesMenubar";
 
-
-
 const MemoizedUsername = memo(({ name }) => {
   return (
     <div className="flex flex-col justify-center space-y-2">
@@ -413,7 +411,7 @@ export default function Profile() {
 
       if (response.status === 200) {
         const updatedIsSaved = { ...isSaved, [id]: !isSaved[id] };
-        localStorage.setItem("isSaved", JSON.stringify(updatedIsSaved));
+        localStorage.setItem(`isSaved_${userIdToUse}`, JSON.stringify(updatedIsSaved));
 
         setIsSaved(updatedIsSaved);
         fetchRecipe(userIdToUse, token);
@@ -424,7 +422,9 @@ export default function Profile() {
     }
   };
   useEffect(() => {
-    const storedIsSaved = JSON.parse(localStorage.getItem("isSaved")) || {};
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
+    const storedIsSaved = JSON.parse(localStorage.getItem(`isSaved_${userIdToUse}`)) || {};
     setIsSaved(storedIsSaved);
   }, []);
 
@@ -444,7 +444,7 @@ export default function Profile() {
 
       if (response.status === 200) {
         const updatedIsLiked = { ...isLiked, [id]: !isLiked[id] };
-        localStorage.setItem("isLiked", JSON.stringify(updatedIsLiked));
+        localStorage.setItem(`isLiked_${userIdToUse}`, JSON.stringify(updatedIsLiked));
         setIsLiked(updatedIsLiked);
         fetchRecipe(userIdToUse, token);
         fetchUserData(userIdToUse, token);
@@ -455,7 +455,9 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    const storedIsLiked = JSON.parse(localStorage.getItem("isLiked")) || {};
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
+    const storedIsLiked = JSON.parse(localStorage.getItem(`isLiked_${userIdToUse}`)) || {};
     setIsLiked(storedIsLiked);
   }, []);
 
@@ -511,8 +513,12 @@ export default function Profile() {
           <MemoizedUsername name={userData?.name} />
         </div>
         <div className="flex flex-row space-x-12 px-6">
-          <h3 className="text-gray-500 font-medium">{userData?.following?.length || 0} Following</h3>
-          <h3 className="text-gray-500 font-medium">{userData?.followers?.length || 0} Followers</h3>
+          <h3 className="text-gray-500 font-medium">
+            {userData?.following?.length || 0} Following
+          </h3>
+          <h3 className="text-gray-500 font-medium">
+            {userData?.followers?.length || 0} Followers
+          </h3>
           <h3 className="text-gray-500 font-medium">{totalLikes || 0} Likes</h3>
         </div>
       </div>
