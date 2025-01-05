@@ -11,6 +11,7 @@ import {
   FaShare,
 } from "react-icons/fa";
 import "../App.css";
+import { useNavigate } from "react-router-dom";
 
 const RecipeAPI = "http://localhost:5000/api/recipe/create-recipe";
 const GetRecipeAPI = "http://localhost:5000/api/recipe/get-recipe";
@@ -35,8 +36,11 @@ const MemoizedLikes = memo(({ likes }) => {
 });
 
 const MemoizedRecipeCard = memo(
-  ({ recipe, handleLikeRecipe, handleSaveRecipe, isSaved, isLiked }) => {
+  ({ recipe, handleLikeRecipe, handleSaveRecipe,handleViewProfile, isSaved, isLiked }) => {
     const memoizedRecipeCard = useMemo(() => {
+
+      const following_id = recipe.createdBy?._id;
+      console.log("followingId",following_id);
       return (
         <div
           key={recipe._id}
@@ -46,7 +50,7 @@ const MemoizedRecipeCard = memo(
             <div className="p-6 rounded-full bg-gray-200" />
             <div className="flex flex-row items-center justify-between w-full">
               <div>
-                <p className="text-sm font-medium">
+                <p className="text-sm font-medium" onClick={() => handleViewProfile(following_id)}  >
                   {recipe.createdBy?.name || "Null"}
                 </p>
                 <p className="text-[12px]">{recipe.timeSince}</p>
@@ -149,7 +153,7 @@ const MemoizedRecipeCard = memo(
 );
 
 const MemoizedRecipe = memo(
-  ({ recipes, handleLikeRecipe, handleSaveRecipe, isSaved, isLiked }) => {
+  ({ recipes, handleLikeRecipe,handleViewProfile, handleSaveRecipe, isSaved, isLiked }) => {
     return (
       <div className="mt-4">
         {recipes.length > 0 ? (
@@ -157,6 +161,7 @@ const MemoizedRecipe = memo(
             <MemoizedRecipeCard
               key={recipe._id}
               recipe={recipe}
+              handleViewProfile={handleViewProfile}
               handleLikeRecipe={handleLikeRecipe}
               handleSaveRecipe={handleSaveRecipe}
               isLiked={isLiked}
@@ -177,6 +182,7 @@ const Home = () => {
   const [userIdToUse, setUserIdToUse] = useState(null);
   const [isLiked, setIsLiked] = useState({});
   const [isSaved, setIsSaved] = useState({});
+  const navigate = useNavigate();
 
   const getRecipes = async () => {
     try {
@@ -297,10 +303,16 @@ const Home = () => {
     getRecipes();
   }, []);
 
+  const handleViewProfile = (userId) => {
+    navigate(`/userprofile/${userId}`);
+  };
+  
+
   return (
     <div className="flex-1 flex flex-col w-full py-20 px-10">
       <div className="px-6">
         <MemoizedRecipe
+        handleViewProfile={handleViewProfile}
           recipes={sortedRecipes}
           handleLikeRecipe={handleLikeRecipe}
           handleSaveRecipe={handleSaveRecipe}
