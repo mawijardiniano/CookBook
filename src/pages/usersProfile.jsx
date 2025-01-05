@@ -33,6 +33,8 @@ const ProfileComponent = ({
   isLiked,
   isSaved,
   handleSaveRecipe,
+  followUser,
+  unfollowUser,
 }) => {
   return (
     <div className="py-28 px-12">
@@ -40,11 +42,11 @@ const ProfileComponent = ({
         <div className="p-16 bg-gray-200 rounded-full" />
         <div className="flex justify-center flex-col space-y-2">
           <UsernameProfile userData={userData} />
-          <Buttons />
+          <Buttons followUser={followUser} unfollowUser={unfollowUser}/>
         </div>
       </div>
       <div className="py-6">
-      <FollowingList userData={userData} totalLikes={totalLikes} />
+        <FollowingList userData={userData} totalLikes={totalLikes} />
       </div>
       <MemoizedRecipeLists
         recipes={recipe}
@@ -56,7 +58,6 @@ const ProfileComponent = ({
     </div>
   );
 };
-
 
 const UsernameProfile = memo(({ userData }) => <p>{userData?.name}</p>);
 
@@ -93,7 +94,7 @@ const timeSince = (date) => {
 };
 
 //temporarily using this component to test the follow/unfollow functionality
-const Buttons = memo(({ followUser }) => {
+const Buttons = memo(({ followUser, unfollowUser }) => {
   const token = localStorage.getItem("authToken");
   const loggedUserId = token ? jwtDecode(token)?.userId : null;
   const { userId } = useParams();
@@ -103,11 +104,13 @@ const Buttons = memo(({ followUser }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/user/profile/${userId}`);
+        const response = await axios.get(
+          `http://localhost:5000/api/user/profile/${userId}`
+        );
         setUserData(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
         setLoading(false);
       }
     };
@@ -117,10 +120,10 @@ const Buttons = memo(({ followUser }) => {
     }
   }, [userId]);
 
-  const isFollowing = userData?.following?.includes(loggedUserId);  
+  const isFollowing = userData?.following?.includes(loggedUserId);
   const isFollowedBack = userData?.followers?.includes(loggedUserId);
   const isFriend = isFollowing && isFollowedBack;
-  
+
   return (
     <div className="flex space-x-4">
       {isFriend ? (
@@ -128,7 +131,6 @@ const Buttons = memo(({ followUser }) => {
           Friends
         </span>
       ) : isFollowedBack ? (
-
         <span className="bg-gray-200 py-1 px-3 text-sm font-medium rounded-md">
           Following
         </span>
@@ -150,7 +152,6 @@ const Buttons = memo(({ followUser }) => {
         </Button>
       )}
 
-
       <Button
         style={{ backgroundColor: "black" }}
         className="text-white text-sm px-3 rounded-md"
@@ -164,17 +165,13 @@ const Buttons = memo(({ followUser }) => {
             <FaUserCog size={16} />
           </MenubarTrigger>
           <MenubarContent>
-            <MenubarItem>Unfollow</MenubarItem>
+            <MenubarItem  onClick={() => unfollowUser?.(userData._id)}>Unfollow</MenubarItem>
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
     </div>
   );
 });
-
-
-
-
 
 const MemoizedRecipeLists = memo(
   ({ recipes, handleLikeRecipe, isLiked, handleSaveRecipe, isSaved }) => (
@@ -302,6 +299,7 @@ const FollowingList = memo(({ userData, totalLikes }) => (
 
 const UsersProfile = () => {
   const [userData, setUserData] = useState(null);
+  const [followings, setFollowings] = useState([]);
   const { userId } = useParams();
   const [recipe, setRecipe] = useState([]);
   const [isLiked, setIsLiked] = useState({});
@@ -316,6 +314,8 @@ const UsersProfile = () => {
     `http://localhost:5000/api/recipe/save-recipe/${id}`;
   const UnsaveRecipeAPI = (id) =>
     `http://localhost:5000/api/recipe/unsave-recipe/${id}`;
+  const UNFOLLOW_API = (id) => `http://localhost:5000/api/user/unfollow/${id}`;
+  const FOLLOW = (id) => `http://localhost:5000/api/user/follow/${id}`;
 
   const fetchRecipe = async (id) => {
     try {
@@ -345,6 +345,68 @@ const UsersProfile = () => {
     }
   };
 
+  const unfollowUser = async (id) => {
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
+  
+    try {
+      const response = await axios.post(
+        UNFOLLOW_API(id),
+        { userId: userIdToUse },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      console.log("User unfollowed", response.data);
+  
+      // Update followings in state and localStorage
+      const updatedFollowings = followings.filter(
+        (following) => following._id !== id
+      );
+      setFollowings(updatedFollowings);
+      setUserData((prev) => ({
+        ...prev,
+        following: updatedFollowings,
+      }));
+      localStorage.setItem("followings", JSON.stringify(updatedFollowings));
+      window.location.reload();
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+    }
+  };
+  
+
+  const followUser = async (id) => {
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
+
+    try {
+      const response = await axios.post(
+        FOLLOW(id),
+        { userId: userIdToUse },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log("User followed", response.data);
+
+      const updatedFollowings = [...followings, response.data];
+      setFollowings(updatedFollowings);
+      localStorage.setItem("followings", JSON.stringify(updatedFollowings));
+      window.location.reload();
+    } catch (error) {
+      console.error("Error following user:", error);
+    }
+  };
+
+  useEffect(() => {
+    const storedFollowings =
+      JSON.parse(localStorage.getItem("followings")) || [];
+    setFollowings(storedFollowings);
+  }, []);
+
   const handleSaveRecipe = async (id) => {
     const token = localStorage.getItem("authToken");
     const userIdToUse = jwtDecode(token)?.userId;
@@ -355,7 +417,10 @@ const UsersProfile = () => {
 
       if (response.status === 200) {
         const updatedIsSaved = { ...isSaved, [id]: !isSaved[id] };
-        localStorage.setItem(`isSaved_${userIdToUse}`, JSON.stringify(updatedIsSaved));
+        localStorage.setItem(
+          `isSaved_${userIdToUse}`,
+          JSON.stringify(updatedIsSaved)
+        );
 
         setIsSaved(updatedIsSaved);
         fetchRecipe(userIdToUse, token);
@@ -368,7 +433,8 @@ const UsersProfile = () => {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const userIdToUse = jwtDecode(token)?.userId;
-    const storedIsSaved = JSON.parse(localStorage.getItem(`isSaved_${userIdToUse}`)) || {};
+    const storedIsSaved =
+      JSON.parse(localStorage.getItem(`isSaved_${userIdToUse}`)) || {};
     setIsSaved(storedIsSaved);
   }, []);
 
@@ -389,7 +455,10 @@ const UsersProfile = () => {
 
       if (response.status === 200) {
         const updatedIsLiked = { ...isLiked, [id]: !isLiked[id] };
-        localStorage.setItem(`isLiked_${userIdToUse}`, JSON.stringify(updatedIsLiked));
+        localStorage.setItem(
+          `isLiked_${userIdToUse}`,
+          JSON.stringify(updatedIsLiked)
+        );
         setIsLiked(updatedIsLiked);
         fetchRecipe(userIdToUse, token);
         fetchUserData(userIdToUse, token);
@@ -402,12 +471,12 @@ const UsersProfile = () => {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const userIdToUse = jwtDecode(token)?.userId;
-    const storedIsLiked = JSON.parse(localStorage.getItem(`isLiked_${userIdToUse}`)) || {};
+    const storedIsLiked =
+      JSON.parse(localStorage.getItem(`isLiked_${userIdToUse}`)) || {};
     setIsLiked(storedIsLiked);
   }, []);
 
   useEffect(() => {
-    
     if (userId) {
       console.log("Using User ID:", userId);
       fetchUserData(userId);
@@ -426,6 +495,8 @@ const UsersProfile = () => {
 
   return (
     <ProfileComponent
+    unfollowUser={unfollowUser}
+      followUser={followUser}
       userData={userData}
       totalLikes={totalLikes}
       recipe={sortedRecipes}
