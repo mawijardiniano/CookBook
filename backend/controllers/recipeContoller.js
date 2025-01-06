@@ -63,6 +63,9 @@ const getRecipeByUser = async (req, res) => {
     const recipes = await Recipe.find({ createdBy: id }).populate({
       path: "createdBy",
       select: "name",
+    }).populate({
+      path: "comments.user",
+      select: "name",
     });
     const recipesWithTimeSince = recipes.map((recipe) => ({
       ...recipe.toObject(),
@@ -76,6 +79,10 @@ const getRecipes = async (req, res) => {
   try {
     const recipes = await Recipe.find().populate({
       path: "createdBy",
+      select: "name",
+    })
+    .populate({
+      path: "comments.user",
       select: "name",
     });
     const recipesWithTimeSince = recipes.map((recipe) => ({
@@ -257,5 +264,19 @@ const Comment = async (req, res) => {
   }
 }
 
+const getCommentsonRecipe = async (req, res) => {
+  const { id } = req.params; // Recipe ID
 
-module.exports = { createRecipe, getRecipes, getRecipeByUser, deleteRecipe,likeRecipe,unlikeRecipe, saveRecipe, unSaveRecipe, editRecipe, Comment };
+  try {
+    const recipe = await Recipe.findById(id).populate("comments.user", "name email");
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found." });
+    }
+
+    res.status(200).json(recipe.comments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+module.exports = { createRecipe, getRecipes, getRecipeByUser, deleteRecipe,likeRecipe,unlikeRecipe, saveRecipe, unSaveRecipe, editRecipe, Comment, getCommentsonRecipe };

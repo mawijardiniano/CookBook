@@ -14,7 +14,6 @@ import "../App.css";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 
-
 const RecipeAPI = "http://localhost:5000/api/recipe/create-recipe";
 const GetRecipeAPI = "http://localhost:5000/api/recipe/get-recipe";
 const LikeRecipeAPI = (id) =>
@@ -27,6 +26,7 @@ const saveRecipeAPI = (id) =>
   `http://localhost:5000/api/recipe/save-recipe/${id}`;
 const UnsaveRecipeAPI = (id) =>
   `http://localhost:5000/api/recipe/unsave-recipe/${id}`;
+const GetCommentAPI = (recipeId) => `http://localhost:5000/api/recipe/get-comments/${recipeId}`;
 
 const MemoizedLikes = memo(({ likes }) => {
   return (
@@ -37,6 +37,30 @@ const MemoizedLikes = memo(({ likes }) => {
   );
 });
 
+const timeSince = (date) => {
+  const now = new Date();
+  const seconds = Math.floor((now - new Date(date)) / 1000);
+
+  const intervals = [
+    { label: "year", seconds: 31536000 },
+    { label: "month", seconds: 2592000 },
+    { label: "week", seconds: 604800 },
+    { label: "day", seconds: 86400 },
+    { label: "hour", seconds: 3600 },
+    { label: "minute", seconds: 60 },
+    { label: "second", seconds: 1 },
+  ];
+
+  for (const interval of intervals) {
+    const count = Math.floor(seconds / interval.seconds);
+    if (count >= 1) {
+      return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
+    }
+  }
+  return "Just now";
+};
+
+
 const MemoizedRecipeCard = memo(
   ({
     recipe,
@@ -46,6 +70,25 @@ const MemoizedRecipeCard = memo(
     isSaved,
     isLiked,
   }) => {
+const [comments, setComments] = useState([]);
+
+useEffect(() => {
+const fetchComments = async () => {
+  try {
+    const response = await axios.get(GetCommentAPI(recipe._id));
+console.log("response", response.data);
+    const sortedComments = response.data.sort(
+            (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
+          );
+          setComments(sortedComments);
+    console.log("comments", sortedComments);
+  } catch (error) {
+    
+  }
+}
+fetchComments();
+}, [recipe._id]);
+
     const memoizedRecipeCard = useMemo(() => {
       const following_id = recipe.createdBy?._id;
       console.log("followingId", following_id);
@@ -152,23 +195,17 @@ const MemoizedRecipeCard = memo(
             </div>
           </div>
           <div className="border-t-2 border-gray-200 ">
-          <div className="flex flex-col py-2">
-  {Array.isArray(recipe.comments) &&
-    recipe.comments.map((comment, index) => (
-      <div
-        key={index}
-        className="flex flex-col py-1 px-4 bg-gray-200 rounded-md mb-1"
-      >
-        <p className="text-xs font-medium text-gray-800">{comment.user}</p>
-        <p className="text-xs text-gray-600">{comment.text}</p>
-      </div>
-    ))}
-</div>
-
+            <div className="flex flex-col py-2">
+            {comments.map((comment) => (
+            <div key={comment._id} className="flex flex-col py-1 px-4 bg-white rounded-md mb-1">
+            <p className="text-xs">{comment.user?.name}</p>
+              <p className="text-xs">{comment.text}</p>
+            </div>
+            
+          ))}
+            </div>
           </div>
-          <Input
-              placeholder="Add a comment"
-              />
+          <Input placeholder="Add a comment" />
         </div>
       );
     }, [
@@ -176,6 +213,7 @@ const MemoizedRecipeCard = memo(
       recipe.likes.length,
       isSaved[recipe._id],
       isLiked[recipe._id],
+      comments
     ]);
 
     return memoizedRecipeCard;
@@ -190,6 +228,7 @@ const MemoizedRecipe = memo(
     handleSaveRecipe,
     isSaved,
     isLiked,
+
   }) => {
     return (
       <div className="mt-4">
@@ -203,6 +242,7 @@ const MemoizedRecipe = memo(
               handleSaveRecipe={handleSaveRecipe}
               isLiked={isLiked}
               isSaved={isSaved}
+
             />
           ))
         ) : (
