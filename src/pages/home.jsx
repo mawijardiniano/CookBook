@@ -10,6 +10,15 @@ import {
   FaRegHeart,
   FaShare,
 } from "react-icons/fa";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
 import "../App.css";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -26,7 +35,8 @@ const saveRecipeAPI = (id) =>
   `http://localhost:5000/api/recipe/save-recipe/${id}`;
 const UnsaveRecipeAPI = (id) =>
   `http://localhost:5000/api/recipe/unsave-recipe/${id}`;
-const GetCommentAPI = (recipeId) => `http://localhost:5000/api/recipe/get-comments/${recipeId}`;
+const GetCommentAPI = (recipeId) =>
+  `http://localhost:5000/api/recipe/get-comments/${recipeId}`;
 
 const MemoizedLikes = memo(({ likes }) => {
   return (
@@ -59,6 +69,83 @@ const timeSince = (date) => {
   }
   return "Just now";
 };
+const CommentsDialog = memo(({ recipe, comments }) => {
+  return (
+    <Dialog>
+      <DialogTrigger className="text-xs text-gray-400">View all comments</DialogTrigger>
+      <DialogContent className="bg-white" style={{ width: '1000px', maxWidth: '70%' }}>
+        <DialogHeader>
+          <h3 className="text-lg font-semibold">{recipe?.title}</h3>
+        </DialogHeader>
+        <DialogDescription>
+          <div className="mb-4">
+          <div className="flex flex-row space-x-2 items-center">
+          <div className="p-6 rounded-full bg-gray-200" />
+          <div>
+          <p className="text-xs font-medium">{recipe.createdBy?.name}</p>
+          <p className="text-xs">{recipe.timeSince}</p>
+          </div>
+          </div>
+          <div className="pt-4">
+          <p className="font-medium text-lg">{recipe.title}</p>
+            <h4 className="font-medium">Ingredients:</h4>
+            <ul className="text-sm list-disc pl-4">
+              {Array.isArray(recipe.ingredients) &&
+                recipe.ingredients.map((ingredient, index) => (
+                  <li key={index}>{ingredient.name}</li>
+                ))}
+            </ul>
+            <h4 className="font-medium ">Instructions:</h4>
+            <ol className="text-sm list-decimal pl-4">
+              {Array.isArray(recipe.instructions) &&
+                recipe.instructions.map((instruction, index) => (
+                  <li key={index}>{instruction.name}</li>
+                ))}
+            </ol>
+            <div className="mt-2">
+              <h4 className="font-medium">Tags:</h4>
+              <ol className="flex flex-wrap gap-2">
+                {Array.isArray(recipe.tags) &&
+                  recipe.tags.map((tag, index) => (
+                    <li
+                      key={index}
+                      className="text-xs font-medium bg-gray-200 px-2 rounded-md"
+                    >
+                      {tag}
+                    </li>
+                  ))}
+              </ol>
+            </div>
+          </div>
+          <div className="flex flex-row items-center space-x-1">
+            <MemoizedLikes likes={recipe.likes.length} />
+          </div>
+          </div>
+
+          <h4 className="font-medium mt-4">Comments:</h4>
+          <div>
+            {comments && comments.length > 0 ? (
+              comments.map((comment) => (
+                <div
+                  key={comment._id}
+                  className="py-2 border-b border-gray-200"
+                >
+                  <p className="text-sm font-medium">{comment.user?.name}</p>
+                  <p className="text-sm">{comment.text}</p>
+                  <p className="text-xs text-gray-500">
+                    {timeSince(comment.createdOn)}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No comments available.</p>
+            )}
+          </div>
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
+  );
+});
 
 
 const MemoizedRecipeCard = memo(
@@ -70,24 +157,26 @@ const MemoizedRecipeCard = memo(
     isSaved,
     isLiked,
   }) => {
-const [comments, setComments] = useState([]);
+    const [comments, setComments] = useState([]);
+    const [latestComment, setLatestComment] = useState([]);
 
-useEffect(() => {
-const fetchComments = async () => {
-  try {
-    const response = await axios.get(GetCommentAPI(recipe._id));
-console.log("response", response.data);
-    const sortedComments = response.data.sort(
+    useEffect(() => {
+      const fetchComments = async () => {
+        try {
+          const response = await axios.get(GetCommentAPI(recipe._id));
+          console.log("response", response.data);
+          const sortedComments = response.data.sort(
             (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
           );
+          const latestComment =
+            sortedComments.length > 0 ? [sortedComments[0]] : [];
+          setLatestComment(latestComment);
           setComments(sortedComments);
-    console.log("comments", sortedComments);
-  } catch (error) {
-    
-  }
-}
-fetchComments();
-}, [recipe._id]);
+          console.log("comments", sortedComments);
+        } catch (error) {}
+      };
+      fetchComments();
+    }, [recipe._id]);
 
     const memoizedRecipeCard = useMemo(() => {
       const following_id = recipe.createdBy?._id;
@@ -195,17 +284,28 @@ fetchComments();
             </div>
           </div>
           <div className="border-t-2 border-gray-200 ">
+          <div>
+          <CommentsDialog recipe={recipe} comments={comments} />
+          </div>
             <div className="flex flex-col py-2">
-            {comments.map((comment) => (
-            <div key={comment._id} className="flex flex-col py-1 px-4 bg-white rounded-md mb-1">
-            <p className="text-xs">{comment.user?.name}</p>
-              <p className="text-xs">{comment.text}</p>
-            </div>
-            
-          ))}
+              {latestComment.map((comment) => (
+                <div>
+                  <div
+                    key={comment._id}
+                    className="flex flex-col py-1 px-4 bg-gray-200 rounded-md mb-1"
+                  >
+                    <p className="text-xs">{comment.user?.name}</p>
+                    <p className="text-xs">{comment.text}</p>
+                  </div>
+                  <p className="text-xs text-gray-500">{timeSince(comment.createdOn)}</p>
+                </div>
+              ))}
             </div>
           </div>
-          <Input placeholder="Add a comment" />
+          <Input
+          style={{backgroundColor: "#e5e7eb"}}
+          className="border border-gray-100"
+           placeholder="Add a comment" />
         </div>
       );
     }, [
@@ -213,7 +313,8 @@ fetchComments();
       recipe.likes.length,
       isSaved[recipe._id],
       isLiked[recipe._id],
-      comments
+      comments,
+      latestComment,
     ]);
 
     return memoizedRecipeCard;
@@ -228,7 +329,6 @@ const MemoizedRecipe = memo(
     handleSaveRecipe,
     isSaved,
     isLiked,
-
   }) => {
     return (
       <div className="mt-4">
@@ -242,7 +342,6 @@ const MemoizedRecipe = memo(
               handleSaveRecipe={handleSaveRecipe}
               isLiked={isLiked}
               isSaved={isSaved}
-
             />
           ))
         ) : (

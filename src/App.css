@@ -9,3 +9,7 @@ body{
     -ms-overflow-style: none;
     scrollbar-width: none;  
   }
+
+  .dialog-custom-width {
+    width: 1500px !important; /* Use !important to ensure this style overrides others */
+  }
