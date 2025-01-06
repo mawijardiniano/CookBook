@@ -233,4 +233,29 @@ const unSaveRecipe = async (req, res) => {
 };
 
 
-module.exports = { createRecipe, getRecipes, getRecipeByUser, deleteRecipe,likeRecipe,unlikeRecipe, saveRecipe, unSaveRecipe, editRecipe };
+const Comment = async (req, res) => {
+  const { id } = req.params; 
+  const { user, text } = req.body;
+
+  try {
+    const recipe = await Recipe.findById(id);
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found." });
+    }
+
+    const newComment = {
+      user,
+      text,
+    };
+
+    recipe.comments.push(newComment);
+    await recipe.save();
+
+    res.status(201).json({ message: "Comment added successfully.", comment: newComment });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+
+module.exports = { createRecipe, getRecipes, getRecipeByUser, deleteRecipe,likeRecipe,unlikeRecipe, saveRecipe, unSaveRecipe, editRecipe, Comment };
