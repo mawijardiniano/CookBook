@@ -69,140 +69,307 @@ const timeSince = (date) => {
   }
   return "Just now";
 };
-const CommentsDialog = memo(({ recipe, comments, isLiked, isSaved, handleSaveRecipe, handleLikeRecipe }) => {
-  return (
-    <Dialog>
-      <DialogTrigger className="text-xs text-gray-400">
-        View all comments
-      </DialogTrigger>
-      <DialogContent
-        className="bg-white"
-        style={{ width: "1000px", maxWidth: "70%" }}
-      >
-        <DialogDescription>
-          <div className="mb-4">
-          <div className="flex flex-row space-x-2 items-center">
-            <div className="p-6 rounded-full bg-gray-200" />
-            <div className="flex flex-row items-center justify-between w-full">
-              <div>
-                <p
-                  className="text-sm font-medium"
-                  onClick={() => handleViewProfile(following_id)}
-                >
-                  {recipe.createdBy?.name || "Null"}
-                </p>
-                <p className="text-[12px]">{recipe.timeSince}</p>
+const CommentsDialog = memo(
+  ({
+    recipe,
+    comments,
+    isLiked,
+    isSaved,
+    handleSaveRecipe,
+    handleLikeRecipe,
+  }) => {
+    return (
+      <Dialog>
+        {comments && comments.length > 0 ? (
+          <DialogTrigger className="text-xs text-gray-400">
+            <p>View all comments</p>
+          </DialogTrigger>
+        ) : (
+          <p className="text-xs text-gray-500">No comments available.</p>
+        )}
+        <DialogContent
+          className="bg-white"
+          style={{ width: "1000px", maxWidth: "70%" }}
+        >
+          <DialogDescription>
+            <div className="mb-4">
+              <div className="flex flex-row space-x-2 items-center">
+                <div className="p-6 rounded-full bg-gray-200" />
+                <div className="flex flex-row items-center justify-between w-full">
+                  <div>
+                    <p
+                      className="text-sm font-medium"
+                      onClick={() => handleViewProfile(following_id)}
+                    >
+                      {recipe.createdBy?.name || "Null"}
+                    </p>
+                    <p className="text-[12px]">{recipe.timeSince}</p>
+                  </div>
+                  <div className="pr-8">
+                    {isSaved[recipe._id] ? (
+                      <FaBookmark
+                        onClick={() => handleSaveRecipe(recipe._id)}
+                        color="yellow"
+                        size={20}
+                      />
+                    ) : (
+                      <>
+                        <FaRegBookmark
+                          onClick={() => handleSaveRecipe(recipe._id)}
+                          size={20}
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="pr-8">
-                {isSaved[recipe._id] ? (
-                  <FaBookmark
-                    onClick={() => handleSaveRecipe(recipe._id)}
-                    color="yellow"
-                    size={20}
-                  />
-                ) : (
-                  <>
-                    <FaRegBookmark
-                      onClick={() => handleSaveRecipe(recipe._id)}
-                      size={20}
-                    />
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-            <div className="pt-4">
-              <p className="font-medium text-lg">{recipe.title}</p>
-              <p>{recipe.description}</p>
-              <h4 className="font-medium">Ingredients:</h4>
-              <ul className="text-sm list-disc pl-4">
-                {Array.isArray(recipe.ingredients) &&
-                  recipe.ingredients.map((ingredient, index) => (
-                    <li key={index}>{ingredient.name}</li>
-                  ))}
-              </ul>
-              <h4 className="font-medium ">Instructions:</h4>
-              <ol className="text-sm list-decimal pl-4">
-                {Array.isArray(recipe.instructions) &&
-                  recipe.instructions.map((instruction, index) => (
-                    <li key={index}>{instruction.name}</li>
-                  ))}
-              </ol>
-              <div className="mt-2">
-                <h4 className="font-medium">Tags:</h4>
-                <ol className="flex flex-wrap gap-2">
-                  {Array.isArray(recipe.tags) &&
-                    recipe.tags.map((tag, index) => (
-                      <li
-                        key={index}
-                        className="text-xs font-medium bg-gray-200 px-2 rounded-md"
-                      >
-                        {tag}
-                      </li>
+              <div className="pt-4">
+                <p className="font-medium text-lg">{recipe.title}</p>
+                <p>{recipe.description}</p>
+                <h4 className="font-medium">Ingredients:</h4>
+                <ul className="text-sm list-disc pl-4">
+                  {Array.isArray(recipe.ingredients) &&
+                    recipe.ingredients.map((ingredient, index) => (
+                      <li key={index}>{ingredient.name}</li>
+                    ))}
+                </ul>
+                <h4 className="font-medium ">Instructions:</h4>
+                <ol className="text-sm list-decimal pl-4">
+                  {Array.isArray(recipe.instructions) &&
+                    recipe.instructions.map((instruction, index) => (
+                      <li key={index}>{instruction.name}</li>
                     ))}
                 </ol>
+                <div className="mt-2">
+                  <h4 className="font-medium">Tags:</h4>
+                  <ol className="flex flex-wrap gap-2">
+                    {Array.isArray(recipe.tags) &&
+                      recipe.tags.map((tag, index) => (
+                        <li
+                          key={index}
+                          className="text-xs font-medium bg-gray-200 px-2 rounded-md"
+                        >
+                          {tag}
+                        </li>
+                      ))}
+                  </ol>
+                </div>
+              </div>
+              <div className="flex flex-row items-center space-x-1 py-2">
+                <MemoizedLikes likes={recipe.likes.length} />
+              </div>
+              <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-b-2 pb-2 border-gray-200">
+                <div className="flex flex-row space-x-2 items-center">
+                  {isLiked[recipe._id] ? (
+                    <FaHeart
+                      onClick={() => handleLikeRecipe(recipe._id)}
+                      color="red"
+                      size={20}
+                    />
+                  ) : (
+                    <>
+                      <FaRegHeart
+                        onClick={() => handleLikeRecipe(recipe._id)}
+                        size={20}
+                      />
+                      <p className="text-sm">Like</p>
+                    </>
+                  )}
+                </div>
+
+                <div className="flex flex-row space-x-2 items-center">
+                  <FaComment size={20} />
+                  <p className="text-sm">Comment</p>
+                </div>
+
+                <div className="flex flex-row space-x-2 items-center">
+                  <FaShare size={20} />
+                  <p className="text-sm">Share</p>
+                </div>
               </div>
             </div>
-            <div className="flex flex-row items-center space-x-1 py-2">
-              <MemoizedLikes likes={recipe.likes.length} />
-            </div>
-            <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-b-2 pb-2 border-gray-200">
-            <div className="flex flex-row space-x-2 items-center">
-              {isLiked[recipe._id] ? (
-                <FaHeart
-                  onClick={() => handleLikeRecipe(recipe._id)}
-                  color="red"
-                  size={20}
-                />
+
+            <div className="overflow-y-auto max-h-28 hide-scrollbar">
+              {comments && comments.length > 0 ? (
+                comments.map((comment) => (
+                  <div key={comment._id} className="py-1  border-gray-200">
+                    <div className="bg-gray-200 rounded-md px-4 py-1">
+                      <p className="text-xs font-medium">
+                        {comment.user?.name}
+                      </p>
+                      <p className="text-xs">{comment.text}</p>
+                    </div>
+
+                    <p className="text-xs text-gray-500">
+                      {timeSince(comment.createdOn)}
+                    </p>
+                  </div>
+                ))
               ) : (
-                <>
-                  <FaRegHeart
-                    onClick={() => handleLikeRecipe(recipe._id)}
-                    size={20}
-                  />
-                  <p className="text-sm">Like</p>
-                </>
+                <p className="text-sm text-gray-500 pb-2">
+                  No comments available.
+                </p>
               )}
             </div>
+            <Input
+              className="border border-slate-400 rounded-md px-4 py-2 text-sm placeholder:text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Add Comment"
+            />
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+);
 
-            <div className="flex flex-row space-x-2 items-center">
-              <FaComment size={20} />
-              <p className="text-sm">Comment</p>
-            </div>
-
-            <div className="flex flex-row space-x-2 items-center">
-              <FaShare size={20} />
-              <p className="text-sm">Share</p>
-            </div>
-          </div>
-          </div>
-
-          <div>
-            {comments && comments.length > 0 ? (
-              comments.map((comment) => (
-                <div
-                  key={comment._id}
-                  className="py-2  border-gray-200"
-                >
-                <div className="bg-gray-200 rounded-md px-4 py-1">
-                <p className="text-xs font-medium">{comment.user?.name}</p>
-                <p className="text-xs">{comment.text}</p>
+const CommentButtonDialog = memo(
+  ({
+    recipe,
+    comments,
+    isSaved,
+    isLiked,
+    handleLikeRecipe,
+    handleSaveRecipe,
+  }) => {
+    return (
+      <Dialog>
+        <DialogTrigger className="flex flex-row gap-2">
+          <FaComment size={20} /> Comment
+        </DialogTrigger>
+        <DialogContent
+          className="bg-white"
+          style={{ width: "1000px", maxWidth: "70%" }}
+        >
+          <DialogDescription>
+            <div className="mb-4">
+              <div className="flex flex-row space-x-2 items-center">
+                <div className="p-6 rounded-full bg-gray-200" />
+                <div className="flex flex-row items-center justify-between w-full">
+                  <div>
+                    <p
+                      className="text-sm font-medium"
+                      onClick={() => handleViewProfile(following_id)}
+                    >
+                      {recipe.createdBy?.name || "Null"}
+                    </p>
+                    <p className="text-[12px]">{recipe.timeSince}</p>
+                  </div>
+                  <div className="pr-8">
+                    {isSaved[recipe._id] ? (
+                      <FaBookmark
+                        onClick={() => handleSaveRecipe(recipe._id)}
+                        color="yellow"
+                        size={20}
+                      />
+                    ) : (
+                      <>
+                        <FaRegBookmark
+                          onClick={() => handleSaveRecipe(recipe._id)}
+                          size={20}
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="pt-4">
+                <p className="font-medium text-lg">{recipe.title}</p>
+                <p>{recipe.description}</p>
+                <h4 className="font-medium">Ingredients:</h4>
+                <ul className="text-sm list-disc pl-4">
+                  {Array.isArray(recipe.ingredients) &&
+                    recipe.ingredients.map((ingredient, index) => (
+                      <li key={index}>{ingredient.name}</li>
+                    ))}
+                </ul>
+                <h4 className="font-medium ">Instructions:</h4>
+                <ol className="text-sm list-decimal pl-4">
+                  {Array.isArray(recipe.instructions) &&
+                    recipe.instructions.map((instruction, index) => (
+                      <li key={index}>{instruction.name}</li>
+                    ))}
+                </ol>
+                <div className="mt-2">
+                  <h4 className="font-medium">Tags:</h4>
+                  <ol className="flex flex-wrap gap-2">
+                    {Array.isArray(recipe.tags) &&
+                      recipe.tags.map((tag, index) => (
+                        <li
+                          key={index}
+                          className="text-xs font-medium bg-gray-200 px-2 rounded-md"
+                        >
+                          {tag}
+                        </li>
+                      ))}
+                  </ol>
+                </div>
+              </div>
+              <div className="flex flex-row items-center space-x-1 py-2">
+                <MemoizedLikes likes={recipe.likes.length} />
+              </div>
+              <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-b-2 pb-2 border-gray-200">
+                <div className="flex flex-row space-x-2 items-center">
+                  {isLiked[recipe._id] ? (
+                    <FaHeart
+                      onClick={() => handleLikeRecipe(recipe._id)}
+                      color="red"
+                      size={20}
+                    />
+                  ) : (
+                    <>
+                      <FaRegHeart
+                        onClick={() => handleLikeRecipe(recipe._id)}
+                        size={20}
+                      />
+                      <p className="text-sm">Like</p>
+                    </>
+                  )}
                 </div>
 
-                  <p className="text-xs text-gray-500">
-                    {timeSince(comment.createdOn)}
-                  </p>
+                <div className="flex flex-row space-x-2 items-center">
+                  <FaComment size={20} />
+                  <p className="text-sm">Comment</p>
                 </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No comments available.</p>
-            )}
-          </div>
-        </DialogDescription>
-      </DialogContent>
-    </Dialog>
-  );
-});
+
+                <div className="flex flex-row space-x-2 items-center">
+                  <FaShare size={20} />
+                  <p className="text-sm">Share</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="overflow-y-auto max-h-28 hide-scrollbar">
+              {comments && comments.length > 0 ? (
+                comments.map((comment) => (
+                  <div key={comment._id} className="py-1  border-gray-200">
+                    <div className="bg-gray-200 rounded-md px-4 py-1">
+                      <p className="text-xs font-medium">
+                        {comment.user?.name}
+                      </p>
+                      <p className="text-xs">{comment.text}</p>
+                    </div>
+
+                    <p className="text-xs text-gray-500">
+                      {timeSince(comment.createdOn)}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 pb-2">
+                  No comments available.
+                </p>
+              )}
+            </div>
+            <Input
+              className="border border-slate-400 rounded-md px-4 py-2 text-sm placeholder:text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Add Comment"
+            />
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+);
 
 const MemoizedRecipeCard = memo(
   ({
@@ -330,8 +497,16 @@ const MemoizedRecipeCard = memo(
             </div>
 
             <div className="flex flex-row space-x-2 items-center">
-              <FaComment size={20} />
-              <p className="text-sm">Comment</p>
+              <p className="text-sm">
+                <CommentButtonDialog
+                  recipe={recipe}
+                  comments={comments}
+                  isSaved={isSaved}
+                  isLiked={isLiked}
+                  handleLikeRecipe={handleLikeRecipe}
+                  handleSaveRecipe={handleSaveRecipe}
+                />
+              </p>
             </div>
 
             <div className="flex flex-row space-x-2 items-center">
@@ -341,7 +516,14 @@ const MemoizedRecipeCard = memo(
           </div>
           <div className="border-t-2 border-gray-200 ">
             <div className="">
-              <CommentsDialog recipe={recipe} comments={comments} isSaved={isSaved} isLiked={isLiked} handleLikeRecipe={handleLikeRecipe} handleSaveRecipe={handleSaveRecipe} />
+              <CommentsDialog
+                recipe={recipe}
+                comments={comments}
+                isSaved={isSaved}
+                isLiked={isLiked}
+                handleLikeRecipe={handleLikeRecipe}
+                handleSaveRecipe={handleSaveRecipe}
+              />
             </div>
             <div className="flex flex-col py-2">
               {latestComment.map((comment) => (
@@ -362,8 +544,8 @@ const MemoizedRecipeCard = memo(
           </div>
           <Input
             style={{ backgroundColor: "#e5e7eb" }}
-            className="border border-gray-100"
-            placeholder="Add a comment"
+            className="border border-slate-400 rounded-md px-4 py-2 text-sm placeholder:text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Add Comment"
           />
         </div>
       );
