@@ -22,6 +22,7 @@ import {
 import "../App.css";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const RecipeAPI = "http://localhost:5000/api/recipe/create-recipe";
 const GetRecipeAPI = "http://localhost:5000/api/recipe/get-recipe";
@@ -37,6 +38,8 @@ const UnsaveRecipeAPI = (id) =>
   `http://localhost:5000/api/recipe/unsave-recipe/${id}`;
 const GetCommentAPI = (recipeId) =>
   `http://localhost:5000/api/recipe/get-comments/${recipeId}`;
+const CommentAPI = (recipeId) =>
+  `http://localhost:5000/api/recipe/comment/${recipeId}`;
 
 const MemoizedLikes = memo(({ likes }) => {
   return (
@@ -380,6 +383,7 @@ const MemoizedRecipeCard = memo(
     isSaved,
     isLiked,
   }) => {
+    const [newComment, setNewComment] = useState("");
     const [comments, setComments] = useState([]);
     const [latestComment, setLatestComment] = useState([]);
 
@@ -400,6 +404,28 @@ const MemoizedRecipeCard = memo(
       };
       fetchComments();
     }, [recipe._id]);
+
+    const addComment = async (recipeId, text, user) => {
+      const token = localStorage.getItem("authToken");
+      console.log("Retrieved Token:", token);
+     const decodedToken = jwtDecode(token);
+      const userId = decodedToken?.userId;
+      const userIdToUse = userId || storedGoogleUser?._id;
+      try {
+        const response = await axios.post(CommentAPI(recipeId), {
+          user: userIdToUse,
+          text,
+        });
+        setNewComment(response.data);
+        console.log(newComment);
+        console.log("Comment added successfully:", response.data.comment);
+      } catch (error) {
+        console.error(
+          "Error adding comment:",
+          error.response?.data?.message || error.message
+        );
+      }
+    };
 
     const memoizedRecipeCard = useMemo(() => {
       const following_id = recipe.createdBy?._id;
@@ -542,11 +568,17 @@ const MemoizedRecipeCard = memo(
               ))}
             </div>
           </div>
-          <Input
-            style={{ backgroundColor: "#e5e7eb" }}
-            className="border border-slate-400 rounded-md px-4 py-2 text-sm placeholder:text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Add Comment"
-          />
+          <div className="flex">
+            <Input
+              onChange={(e) => setNewComment(e.target.value)}
+              style={{ backgroundColor: "#e5e7eb" }}
+              className="border border-slate-400 rounded-md px-4 py-2 text-sm placeholder:text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Add Comment"
+            />
+            <Button onClick={() => addComment(recipe._id, newComment)}>
+              Submit
+            </Button>
+          </div>
         </div>
       );
     }, [
