@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo, useMemo } from "react";
+import React, { useState, useEffect, memo, useMemo, useCallback } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import {
@@ -374,6 +374,22 @@ const CommentButtonDialog = memo(
   }
 );
 
+const MemoizedCommentInput = ({ addComment, handleComment, newComment }) => {
+  return (
+    <div className="flex flex-row">
+      <Input
+        type="text"
+        value={newComment}
+        onChange={(e) => handleComment(e.target.value)} // Update state when typing
+        placeholder="Add Comment"
+        style={{ backgroundColor: "#e5e7eb" }}
+        className="border border-slate-400 rounded-md px-4 py-2 text-sm placeholder:text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <Button onClick={() => addComment(newComment)}>Submit</Button>
+    </div>
+  );
+};
+
 const MemoizedRecipeCard = memo(
   ({
     recipe,
@@ -387,38 +403,67 @@ const MemoizedRecipeCard = memo(
     const [comments, setComments] = useState([]);
     const [latestComment, setLatestComment] = useState([]);
 
-    useEffect(() => {
-      const fetchComments = async () => {
-        try {
-          const response = await axios.get(GetCommentAPI(recipe._id));
-          console.log("response", response.data);
-          const sortedComments = response.data.sort(
-            (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
-          );
-          const latestComment =
-            sortedComments.length > 0 ? [sortedComments[0]] : [];
-          setLatestComment(latestComment);
-          setComments(sortedComments);
-          console.log("comments", sortedComments);
-        } catch (error) {}
-      };
-      fetchComments();
+
+    const handleComment = useCallback((value) => {
+      setNewComment(value);
+    }, []);
+
+    // Function to fetch comments
+    const fetchComments = useCallback(async () => {
+      try {
+        const response = await axios.get(GetCommentAPI(recipe._id));
+        console.log("response", response.data);
+
+        // Sort comments by date (newest first)
+        const sortedComments = response.data.sort(
+          (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
+        );
+
+        // Set the latest comment
+        const latestComment =
+          sortedComments.length > 0 ? [sortedComments[0]] : [];
+        setLatestComment(latestComment);
+
+        // Update comments state
+        setComments(sortedComments);
+
+        console.log("comments", sortedComments);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
     }, [recipe._id]);
 
-    const addComment = async (recipeId, text, user) => {
-      const token = localStorage.getItem("authToken");
-      console.log("Retrieved Token:", token);
-     const decodedToken = jwtDecode(token);
-      const userId = decodedToken?.userId;
-      const userIdToUse = userId || storedGoogleUser?._id;
+    // Fetch comments on mount
+    useEffect(() => {
+      fetchComments();
+    }, [fetchComments]);
+
+    const addComment = async (text) => {
       try {
-        const response = await axios.post(CommentAPI(recipeId), {
-          user: userIdToUse,
+        const token = localStorage.getItem("authToken");
+        console.log("Retrieved Token:", token);
+
+        const decodedToken = token ? jwtDecode(token) : null;
+        const userId = decodedToken?.userId || storedGoogleUser?._id;
+
+        if (!userId) {
+          throw new Error("User not authenticated");
+        }
+
+        const response = await axios.post(CommentAPI(recipe._id), {
+          user: userId,
           text,
         });
-        setNewComment(response.data);
-        console.log(newComment);
-        console.log("Comment added successfully:", response.data.comment);
+
+        const newCommentData = response.data.comment;
+        setComments((prevComments) => [newCommentData, ...prevComments]);
+
+    
+        setNewComment(""); 
+
+        console.log("Comment added successfully:", newCommentData);
+
+         fetchComments()
       } catch (error) {
         console.error(
           "Error adding comment:",
@@ -568,17 +613,11 @@ const MemoizedRecipeCard = memo(
               ))}
             </div>
           </div>
-          <div className="flex">
-            <Input
-              onChange={(e) => setNewComment(e.target.value)}
-              style={{ backgroundColor: "#e5e7eb" }}
-              className="border border-slate-400 rounded-md px-4 py-2 text-sm placeholder:text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Add Comment"
-            />
-            <Button onClick={() => addComment(recipe._id, newComment)}>
-              Submit
-            </Button>
-          </div>
+          <MemoizedCommentInput
+          addComment={addComment}
+          handleComment={handleComment}
+          newComment={newComment}
+        />
         </div>
       );
     }, [
@@ -588,6 +627,7 @@ const MemoizedRecipeCard = memo(
       isLiked[recipe._id],
       comments,
       latestComment,
+      newComment
     ]);
 
     return memoizedRecipeCard;

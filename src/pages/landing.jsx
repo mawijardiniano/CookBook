@@ -14,6 +14,7 @@ export default function Landing() {
   const navigate = useNavigate();
 
   const handleEmailChange = (value) => {
+    console.log(value)
     setEmail(value);
   };
 
@@ -140,8 +141,8 @@ export default function Landing() {
                 onSuccess={handleLoginSuccess}
                 onError={handleLoginFailure}
                 theme="filled_blue"
-                text="Sign in with Google"
-                width="300"
+                text="Continue in with Google"
+                width="450"
               />
             </GoogleOAuthProvider>
           </div>
