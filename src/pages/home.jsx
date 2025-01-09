@@ -80,6 +80,9 @@ const CommentsDialog = memo(
     isSaved,
     handleSaveRecipe,
     handleLikeRecipe,
+    addComment,
+    handleComment,
+    newComment,
   }) => {
     return (
       <Dialog>
@@ -214,9 +217,10 @@ const CommentsDialog = memo(
                 </p>
               )}
             </div>
-            <Input
-              className="border border-slate-400 rounded-md px-4 py-2 text-sm placeholder:text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Add Comment"
+            <MemoizedCommentInput
+              addComment={addComment}
+              handleComment={handleComment}
+              newComment={newComment}
             />
           </DialogDescription>
         </DialogContent>
@@ -233,6 +237,9 @@ const CommentButtonDialog = memo(
     isLiked,
     handleLikeRecipe,
     handleSaveRecipe,
+    addComment,
+    handleComment,
+    newComment,
   }) => {
     return (
       <Dialog>
@@ -363,9 +370,10 @@ const CommentButtonDialog = memo(
                 </p>
               )}
             </div>
-            <Input
-              className="border border-slate-400 rounded-md px-4 py-2 text-sm placeholder:text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Add Comment"
+            <MemoizedCommentInput
+              addComment={addComment}
+              handleComment={handleComment}
+              newComment={newComment}
             />
           </DialogDescription>
         </DialogContent>
@@ -380,7 +388,7 @@ const MemoizedCommentInput = ({ addComment, handleComment, newComment }) => {
       <Input
         type="text"
         value={newComment}
-        onChange={(e) => handleComment(e.target.value)} // Update state when typing
+        onChange={(e) => handleComment(e.target.value)}
         placeholder="Add Comment"
         style={{ backgroundColor: "#e5e7eb" }}
         className="border border-slate-400 rounded-md px-4 py-2 text-sm placeholder:text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -403,28 +411,22 @@ const MemoizedRecipeCard = memo(
     const [comments, setComments] = useState([]);
     const [latestComment, setLatestComment] = useState([]);
 
-
     const handleComment = useCallback((value) => {
       setNewComment(value);
     }, []);
 
-    // Function to fetch comments
     const fetchComments = useCallback(async () => {
       try {
         const response = await axios.get(GetCommentAPI(recipe._id));
         console.log("response", response.data);
-
-        // Sort comments by date (newest first)
         const sortedComments = response.data.sort(
           (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
         );
 
-        // Set the latest comment
         const latestComment =
           sortedComments.length > 0 ? [sortedComments[0]] : [];
         setLatestComment(latestComment);
 
-        // Update comments state
         setComments(sortedComments);
 
         console.log("comments", sortedComments);
@@ -433,7 +435,6 @@ const MemoizedRecipeCard = memo(
       }
     }, [recipe._id]);
 
-    // Fetch comments on mount
     useEffect(() => {
       fetchComments();
     }, [fetchComments]);
@@ -458,12 +459,11 @@ const MemoizedRecipeCard = memo(
         const newCommentData = response.data.comment;
         setComments((prevComments) => [newCommentData, ...prevComments]);
 
-    
-        setNewComment(""); 
+        setNewComment("");
 
         console.log("Comment added successfully:", newCommentData);
 
-         fetchComments()
+        fetchComments();
       } catch (error) {
         console.error(
           "Error adding comment:",
@@ -570,6 +570,9 @@ const MemoizedRecipeCard = memo(
             <div className="flex flex-row space-x-2 items-center">
               <p className="text-sm">
                 <CommentButtonDialog
+                  addComment={addComment}
+                  handleComment={handleComment}
+                  newComment={newComment}
                   recipe={recipe}
                   comments={comments}
                   isSaved={isSaved}
@@ -588,6 +591,9 @@ const MemoizedRecipeCard = memo(
           <div className="border-t-2 border-gray-200 ">
             <div className="">
               <CommentsDialog
+                addComment={addComment}
+                handleComment={handleComment}
+                newComment={newComment}
                 recipe={recipe}
                 comments={comments}
                 isSaved={isSaved}
@@ -614,10 +620,10 @@ const MemoizedRecipeCard = memo(
             </div>
           </div>
           <MemoizedCommentInput
-          addComment={addComment}
-          handleComment={handleComment}
-          newComment={newComment}
-        />
+            addComment={addComment}
+            handleComment={handleComment}
+            newComment={newComment}
+          />
         </div>
       );
     }, [
@@ -627,7 +633,7 @@ const MemoizedRecipeCard = memo(
       isLiked[recipe._id],
       comments,
       latestComment,
-      newComment
+      newComment,
     ]);
 
     return memoizedRecipeCard;
