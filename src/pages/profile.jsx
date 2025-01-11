@@ -336,11 +336,6 @@ const MemoizedRecipeLists = memo(
                   <FaComment size={20} />
                   <p className="text-sm">Comment</p>
                 </div>
-
-                <div className="flex flex-row space-x-2 items-center">
-                  <FaShare size={20} />
-                  <p className="text-sm">Share</p>
-                </div>
               </div>
             </div>
           ))

@@ -12,12 +12,12 @@ const recipeSchema = new mongoose.Schema({
   ingredients: [
     {
       name: { type: String, required: true },
-    },
+    }
   ],
   instructions: [
     {
       name: { type: String, required: true },
-    },
+    }
   ],
   tags: [{ type: String }],
   createdBy: {
@@ -46,23 +46,6 @@ const recipeSchema = new mongoose.Schema({
       text: {
         type: String,
         required: true,
-      },
-      createdOn: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-  ],
-  share: [
-    {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-      caption: {
-        type: String,
-        required: false,
       },
       createdOn: {
         type: Date,

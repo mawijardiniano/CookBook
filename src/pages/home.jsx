@@ -41,11 +41,21 @@ const GetCommentAPI = (recipeId) =>
 const CommentAPI = (recipeId) =>
   `http://localhost:5000/api/recipe/comment/${recipeId}`;
 
-const MemoizedLikes = memo(({ likes }) => {
+const MemoizedLikes = memo(({ likes, comment, share }) => {
   return (
     <>
-      <FaHeart size={16} color="red" />
-      <p className="text-sm">{likes}</p>
+      <div className="flex flex-row justify-between w-full">
+        <div className="flex flex-row items-center">
+          <FaHeart size={16} color="red" />
+          <p className="text-sm">{likes}</p>
+        </div>
+        <div className="flex flex-row space-x-8">
+          <div className="flex flex-row items-center">
+            <FaComment size={16} />
+            <p className="text-xs ml-1">{comment} comments</p>
+          </div>
+        </div>
+      </div>
     </>
   );
 });
@@ -162,7 +172,11 @@ const CommentsDialog = memo(
                 </div>
               </div>
               <div className="flex flex-row items-center space-x-1 py-2">
-                <MemoizedLikes likes={recipe.likes.length} />
+                <MemoizedLikes
+                  likes={recipe.likes.length}
+                  comment={recipe.comments.length}
+           
+                />
               </div>
               <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-b-2 pb-2 border-gray-200">
                 <div className="flex flex-row space-x-2 items-center">
@@ -186,11 +200,6 @@ const CommentsDialog = memo(
                 <div className="flex flex-row space-x-2 items-center">
                   <FaComment size={20} />
                   <p className="text-sm">Comment</p>
-                </div>
-
-                <div className="flex flex-row space-x-2 items-center">
-                  <FaShare size={20} />
-                  <p className="text-sm">Share</p>
                 </div>
               </div>
             </div>
@@ -244,7 +253,7 @@ const CommentButtonDialog = memo(
     return (
       <Dialog>
         <DialogTrigger className="flex flex-row gap-2">
-          <FaComment size={20} /> Comment
+          <FaComment size={16} /> Comment
         </DialogTrigger>
         <DialogContent
           className="bg-white"
@@ -315,7 +324,10 @@ const CommentButtonDialog = memo(
                 </div>
               </div>
               <div className="flex flex-row items-center space-x-1 py-2">
-                <MemoizedLikes likes={recipe.likes.length} />
+                <MemoizedLikes
+                  likes={recipe.likes.length}
+                  comment={recipe.comments.length}
+                />
               </div>
               <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-b-2 pb-2 border-gray-200">
                 <div className="flex flex-row space-x-2 items-center">
@@ -339,11 +351,6 @@ const CommentButtonDialog = memo(
                 <div className="flex flex-row space-x-2 items-center">
                   <FaComment size={20} />
                   <p className="text-sm">Comment</p>
-                </div>
-
-                <div className="flex flex-row space-x-2 items-center">
-                  <FaShare size={20} />
-                  <p className="text-sm">Share</p>
                 </div>
               </div>
             </div>
@@ -546,7 +553,10 @@ const MemoizedRecipeCard = memo(
             </ol>
           </div>
           <div className="flex flex-row items-center space-x-1">
-            <MemoizedLikes likes={recipe.likes.length} />
+            <MemoizedLikes
+              likes={recipe.likes.length}
+              comment={recipe.comments.length}
+            />
           </div>
           <div className="flex flex-row justify-between px-20 pt-2 border-t-2 pb-2 border-gray-200">
             <div className="flex flex-row space-x-2 items-center">
@@ -583,10 +593,6 @@ const MemoizedRecipeCard = memo(
               </p>
             </div>
 
-            <div className="flex flex-row space-x-2 items-center">
-              <FaShare size={20} />
-              <p className="text-sm">Share</p>
-            </div>
           </div>
           <div className="border-t-2 border-gray-200 ">
             <div className="">
