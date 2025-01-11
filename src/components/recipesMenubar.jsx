@@ -65,63 +65,65 @@ export function RecipesMenubar({ recipeId }) {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
+    const fetchData = async () => {
+      const token = localStorage.getItem("authToken");
+      const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));
 
-    if (!token) return;
-
-    try {
-      const decodedToken = jwtDecode(token);
-      const userId = decodedToken.userId;
-      const userIdToUse = userId || storedGoogleUser?._id;
-
-      if (!userIdToUse) {
-        console.warn(
-          "No valid user ID found (neither decoded token nor Google User)."
-        );
+      if (!token) {
+        console.warn("No token found in localStorage.");
+        setLoading(false);
         return;
       }
 
-      console.log("Using User ID:", userIdToUse);
-      if (storedGoogleUser) {
-        setUserData(storedGoogleUser);
-      } else {
-        const fetchUserData = async () => {
+      try {
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+        const userIdToUse = userId || storedGoogleUser?._id;
+
+        if (!userIdToUse) {
+          console.warn("No valid user ID found (neither decoded token nor Google User).");
+          setLoading(false);
+          return;
+        }
+
+        console.log("Using User ID:", userIdToUse);
+
+        // Fetch user data
+        if (storedGoogleUser) {
+          setUserData(storedGoogleUser);
+        } else {
           try {
-            const response = await axios.get(LOGGEDUSER_API(userIdToUse), {
+            const userResponse = await axios.get(LOGGEDUSER_API(userIdToUse), {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
             });
-            setUserData(response.data);
+            setUserData(userResponse.data);
           } catch (error) {
             console.error("Error fetching user data:", error);
           }
-        };
+        }
 
-        const fetchRecipes = async () => {
-          try {
-            const response = await axios.get(RECIPEbyUSER_API(userIdToUse), {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            setRecipes(response.data);
-            console.log("recipes", response.data)
-          } catch (error) {
-            console.error(
-              "Error fetching recipe data:",
-              error?.response?.data || error.message
-            );
-          }
-        };
-
-        fetchUserData();
-        fetchRecipes();
+        // Fetch recipes
+        try {
+          const recipesResponse = await axios.get(RECIPEbyUSER_API(userIdToUse), {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setRecipes(recipesResponse.data);
+          console.log("Fetched recipes:", recipesResponse.data);
+        } catch (error) {
+          console.error("Error fetching recipe data:", error?.response?.data || error.message);
+        }
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error decoding token:", error);
-    }
+    };
+
+    fetchData();
   }, []);
 
   const handleDeleteRecipe = async (recipeId) => {
@@ -207,6 +209,7 @@ export function RecipesMenubar({ recipeId }) {
   };
 
   const handleSubmit = async (e) => {
+   
     e.preventDefault();
     const token = localStorage.getItem("authToken");
     const storedGoogleUser = JSON.parse(localStorage.getItem("googleUser"));

@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
   likedRecipes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
   savedRecipes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
+  sharedRecipes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
   isFollowing: {
     type: Boolean,
     default: false,

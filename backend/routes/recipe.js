@@ -1,5 +1,5 @@
 const express = require("express");
-const { createRecipe, getRecipes, getRecipeByUser,deleteRecipe,likeRecipe, unlikeRecipe, saveRecipe, unSaveRecipe, editRecipe, Comment, getCommentsonRecipe } = require("../controllers/recipeContoller");
+const { createRecipe, getRecipes, getRecipeByUser,deleteRecipe,likeRecipe, unlikeRecipe, saveRecipe, unSaveRecipe, editRecipe, Comment, getCommentsonRecipe, shareRecipe } = require("../controllers/recipeContoller");
 const authenticateToken = require("../middleware/auth");
 const router = express.Router();
 
@@ -14,5 +14,6 @@ router.put("/unlike-recipe/:id", unlikeRecipe);
 router.put("/save-recipe/:id",saveRecipe);
 router.put("/unsave-recipe/:id", unSaveRecipe);
 router.post("/comment/:id", Comment);
+router.post("/share-recipe/:id", shareRecipe);
 
 module.exports = router;

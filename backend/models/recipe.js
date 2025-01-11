@@ -12,12 +12,12 @@ const recipeSchema = new mongoose.Schema({
   ingredients: [
     {
       name: { type: String, required: true },
-    }
+    },
   ],
   instructions: [
     {
       name: { type: String, required: true },
-    }
+    },
   ],
   tags: [{ type: String }],
   createdBy: {
@@ -53,10 +53,23 @@ const recipeSchema = new mongoose.Schema({
       },
     },
   ],
-  shares: {
-    type: Number,
-    default: 0,
-  },
+  share: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      caption: {
+        type: String,
+        required: false,
+      },
+      createdOn: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
 });
 
 module.exports = mongoose.model("Recipe", recipeSchema);
