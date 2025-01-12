@@ -4,12 +4,15 @@ import { FaBell, FaComment, FaBookReader } from "react-icons/fa";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { NameMenubar } from "./menubar";
+import { useNavigate } from "react-router-dom";
+
 
 const Navbar = () => {
   const [query, setQuery] = useState("");
   const [userData, setUserData] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+   const navigate = useNavigate();
 
   const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
   const FILTERUSER_API = (name) =>
@@ -80,6 +83,11 @@ const Navbar = () => {
     }
   }, []);
 
+  const handleViewProfile = (userId) => {
+    navigate(`/userprofile/${userId}`);
+  };
+
+
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow px-6 py-4 z-50 flex flex-row justify-between">
       <div className="flex items-center space-x-3">
@@ -101,11 +109,12 @@ const Navbar = () => {
         </div>
 
         {searchResults.length > 0 && (
-          <div className="absolute top-full left-[-25px] mt-2  w-72 bg-white border border-slate-200 shadow-lg z-10 max-h-60 overflow-auto">
+          <div className="absolute top-full left-0 mt-2 w-72 bg-white border border-slate-200 shadow-lg z-10 max-h-60 overflow-auto">
             <ul>
               {searchResults.map((result) => (
                 <li
                   key={result._id}
+                  onClick={() => handleViewProfile(result._id)}
                   className="py-2 px-3 hover:bg-gray-100 cursor-pointer"
                 >
                   {result.name}
