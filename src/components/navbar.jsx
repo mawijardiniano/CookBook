@@ -8,11 +8,33 @@ import { NameMenubar } from "./menubar";
 const Navbar = () => {
   const [query, setQuery] = useState("");
   const [userData, setUserData] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
+  const FILTERUSER_API = (name) =>
+    `http://localhost:5000/api/user/filter-user?name=${encodeURIComponent(name)}`;
 
-  const handleSearchChange = (e) => {
-    setQuery(e.target.value);
+  const handleSearchChange = async (e) => {
+    const searchQuery = e.target.value;
+    setQuery(searchQuery);
+
+    if (searchQuery.trim() === "") {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+
+    try {
+      const response = await axios.get(FILTERUSER_API(searchQuery));
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   useEffect(() => {
@@ -66,7 +88,8 @@ const Navbar = () => {
           <span className="text-black">CookBook</span>
         </h1>
       </div>
-      <div className="flex items-center justify-end space-x-6">
+
+      <div className="flex items-center justify-end space-x-6 relative">
         <div>
           <Input
             type="text"
@@ -77,10 +100,25 @@ const Navbar = () => {
           />
         </div>
 
+        {searchResults.length > 0 && (
+          <div className="absolute top-full left-[-25px] mt-2  w-72 bg-white border border-slate-200 shadow-lg z-10 max-h-60 overflow-auto">
+            <ul>
+              {searchResults.map((result) => (
+                <li
+                  key={result._id}
+                  className="py-2 px-3 hover:bg-gray-100 cursor-pointer"
+                >
+                  {result.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div className="flex items-center space-x-6">
           <FaBell className="text-gray-500 hover:text-gray-700" size={24} />
           <FaComment className="text-gray-500 hover:text-gray-700" size={24} />
-          <NameMenubar/>
+          <NameMenubar />
         </div>
       </div>
     </nav>

@@ -45,9 +45,9 @@ const MemoizedLikes = memo(({ likes, comment, share }) => {
   return (
     <>
       <div className="flex flex-row justify-between w-full">
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center ">
           <FaHeart size={16} color="red" />
-          <p className="text-sm">{likes}</p>
+          <p className="text-sm ml-1">{likes}</p>
         </div>
         <div className="flex flex-row space-x-8">
           <div className="flex flex-row items-center">

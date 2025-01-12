@@ -13,3 +13,14 @@ body{
   .dialog-custom-width {
     width: 1500px !important; /* Use !important to ensure this style overrides others */
   }
+
+  /* Add these styles to make sure the dropdown shows up correctly */
+.navbar .dropdown {
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  z-index: 1000; /* Ensure it's above other elements */
+  max-height: 300px;
+  overflow-y: auto; /* Add scrolling if there are many results */
+}

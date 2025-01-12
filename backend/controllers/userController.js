@@ -184,6 +184,31 @@ const getUserLoggedin = async (req, res) => {
   }
 };
 
+
+const searchUser = async (req, res) => {
+  try {
+    const { name } = req.query;
+
+    if (!name) {
+      return res.status(400).json({ message: "Name query parameter is required" });
+    }
+
+    const filteredUsers = await User.find({
+      name: { $regex: name, $options: "i" },
+    });
+
+    if (filteredUsers.length === 0) {
+      return res.status(404).json({ message: "No users found" });
+    }
+
+    res.status(200).json(filteredUsers);
+  } catch (error) {
+    console.error("Error searching users:", error);
+    res.status(500).json({ message: "An error occurred while searching for users" });
+  }
+};
+
+
 const editUsername = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -307,4 +332,5 @@ module.exports = {
   editUsername,
   FollowUser,
   UnFollow,
+  searchUser
 };

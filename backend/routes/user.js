@@ -8,7 +8,8 @@ const {
   editUsername,
   googleLogin,
   FollowUser,
-  UnFollow
+  UnFollow,
+  searchUser
 } = require("../controllers/userController");
 const authenticateToken = require("../middleware/auth");
 const router = express.Router();
@@ -22,5 +23,6 @@ router.put("/edit/:userId", editUsername)
 router.get("/user/:id", authenticateToken, getUserLoggedin);
 router.get("/profile/:userId", getUserProfile);
 router.get("/all", getAllUsers);
+router.get("/filter-user", searchUser);
 
 module.exports = router;

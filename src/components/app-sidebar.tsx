@@ -28,11 +28,6 @@ const items = [
     url: "/profile",
     icon: User,
   },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: CogIcon,
-  },
 ];
 
 export function AppSidebar() {
