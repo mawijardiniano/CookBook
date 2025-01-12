@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "backend/app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node backend/app.js",
     "build": "echo \"No build script required\""
   },
   "keywords": [],
