@@ -85,6 +85,7 @@ const Navbar = () => {
 
   const handleViewProfile = (userId) => {
     navigate(`/userprofile/${userId}`);
+    setSearchResults([]); 
   };
 
 
