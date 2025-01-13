@@ -5,7 +5,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { NameMenubar } from "./menubar";
 import { useNavigate } from "react-router-dom";
-
+import Notification from "./notification";
 
 const Navbar = () => {
   const [query, setQuery] = useState("");
@@ -86,6 +86,7 @@ const Navbar = () => {
   const handleViewProfile = (userId) => {
     navigate(`/userprofile/${userId}`);
     setSearchResults([]); 
+    setQuery("")
   };
 
 
@@ -110,7 +111,7 @@ const Navbar = () => {
         </div>
 
         {searchResults.length > 0 && (
-          <div className="absolute top-full left-0 mt-2 w-72 bg-white border border-slate-200 shadow-lg z-10 max-h-60 overflow-auto">
+          <div className="absolute top-full left-[-25px] mt-2 w-72 bg-white border border-slate-200 shadow-lg z-10 max-h-60 overflow-auto">
             <ul>
               {searchResults.map((result) => (
                 <li
@@ -126,7 +127,7 @@ const Navbar = () => {
         )}
 
         <div className="flex items-center space-x-6">
-          <FaBell className="text-gray-500 hover:text-gray-700" size={24} />
+          <Notification className="text-gray-500 hover:text-gray-700" size={24} />
           <FaComment className="text-gray-500 hover:text-gray-700" size={24} />
           <NameMenubar />
         </div>
