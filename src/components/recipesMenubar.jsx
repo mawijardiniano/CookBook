@@ -44,14 +44,14 @@ export function RecipesMenubar({ recipeId }) {
   const [selectedRecipe, setSelectedRecipe] = useState(null)
   const navigate = useNavigate();
 
-  const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
+  const LOGGEDUSER_API = (id) => `${import.meta.env.LOGGEDUSER_API}${id}`;
   const DELETERECIPE_API = (id) =>
-    `http://localhost:5000/api/recipe/delete-recipe/${id}`;
+    `${import.meta.env.DELETERECIPE_API}${id}`;
   const RECIPEbyUSER_API = (id) =>
-    `http://localhost:5000/api/recipe/get-recipe/${id}`;
+    `${import.meta.env.RECIPEbyUSER_API}${id}`;
 
   const handleEditClick = (recipeId) => {
-    setSelectedRecipe(recipeId); // Set the selected recipe ID
+    setSelectedRecipe(recipeId);
     const recipe = recipes.find((r) => r._id === recipeId);
     if (recipe) {
       setRecipeFormData({

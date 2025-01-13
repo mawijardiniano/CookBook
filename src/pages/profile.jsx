@@ -354,17 +354,17 @@ export default function Profile() {
   const [isLiked, setIsLiked] = useState({});
   const [isSaved, setIsSaved] = useState({});
 
-  const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
+  const LOGGEDUSER_API = (id) => `${import.meta.env.LOGGEDUSER_API}${id}`;
   const RECIPEbyUSER_API = (id) =>
-    `http://localhost:5000/api/recipe/get-recipe/${id}`;
+    `${import.meta.env.RECIPEbyUSER_API}${id}`;
   const LikeRecipeAPI = (id) =>
-    `http://localhost:5000/api/recipe/like-recipe/${id}`;
+    `${import.meta.env.LikeRecipeAPI}${id}`;
   const UnLikeRecipeAPI = (id) =>
-    `http://localhost:5000/api/recipe/unlike-recipe/${id}`;
+    `${import.meta.env.UnLikeRecipeAPI}${id}`;
   const saveRecipeAPI = (id) =>
-    `http://localhost:5000/api/recipe/save-recipe/${id}`;
+    `${import.meta.env.saveRecipeAPI}/${id}`;
   const UnsaveRecipeAPI = (id) =>
-    `http://localhost:5000/api/recipe/unsave-recipe/${id}`;
+    `${import.meta.env.UnsaveRecipeAPI}${id}`;
 
   const fetchRecipe = async (userIdToUse, token) => {
     try {

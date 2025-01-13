@@ -12,11 +12,11 @@ const Navbar = () => {
   const [userData, setUserData] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-   const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
+  const LOGGEDUSER_API = (id) => `${import.meta.env.LOGGEDUSER_API}${id}`;
   const FILTERUSER_API = (name) =>
-    `http://localhost:5000/api/user/filter-user?name=${encodeURIComponent(name)}`;
+    `${import.meta.env.FILTERUSER_API}?name=${encodeURIComponent(name)}`;
 
   const handleSearchChange = async (e) => {
     const searchQuery = e.target.value;
@@ -85,10 +85,9 @@ const Navbar = () => {
 
   const handleViewProfile = (userId) => {
     navigate(`/userprofile/${userId}`);
-    setSearchResults([]); 
-    setQuery("")
+    setSearchResults([]);
+    setQuery("");
   };
-
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow px-6 py-4 z-50 flex flex-row justify-between">
@@ -127,7 +126,10 @@ const Navbar = () => {
         )}
 
         <div className="flex items-center space-x-6">
-          <Notification className="text-gray-500 hover:text-gray-700" size={24} />
+          <Notification
+            className="text-gray-500 hover:text-gray-700"
+            size={24}
+          />
           <FaComment className="text-gray-500 hover:text-gray-700" size={24} />
           <NameMenubar />
         </div>

@@ -24,22 +24,14 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const RecipeAPI = "http://localhost:5000/api/recipe/create-recipe";
-const GetRecipeAPI = "http://localhost:5000/api/recipe/get-recipe";
-const LikeRecipeAPI = (id) =>
-  `http://localhost:5000/api/recipe/like-recipe/${id}`;
-const UnLikeRecipeAPI = (id) =>
-  `http://localhost:5000/api/recipe/unlike-recipe/${id}`;
-const LOGGEDUSER_API = (userId) =>
-  `http://localhost:5000/api/user/user/${userId}`;
-const saveRecipeAPI = (id) =>
-  `http://localhost:5000/api/recipe/save-recipe/${id}`;
-const UnsaveRecipeAPI = (id) =>
-  `http://localhost:5000/api/recipe/unsave-recipe/${id}`;
-const GetCommentAPI = (recipeId) =>
-  `http://localhost:5000/api/recipe/get-comments/${recipeId}`;
-const CommentAPI = (recipeId) =>
-  `http://localhost:5000/api/recipe/comment/${recipeId}`;
+const GetRecipeAPI = `${import.meta.env.GetRecipeAPI}`;
+const LikeRecipeAPI = (id) => `${import.meta.env.LikeRecipeAPI}${id}`;
+const UnLikeRecipeAPI = (id) => `${import.meta.env.UnLikeRecipeAPI}${id}`;
+const LOGGEDUSER_API = (userId) => `${import.meta.env.LOGGEDUSER_API}${userId}`;
+const saveRecipeAPI = (id) => `${import.meta.env.saveRecipeAPI}${id}`;
+const UnsaveRecipeAPI = (id) => `${import.meta.env.UnsaveRecipeAPI}${id}`;
+const GetCommentAPI = (recipeId) => `${import.meta.env.GetCommentAPI}${recipeId}`;
+const CommentAPI = (recipeId) => `${import.meta.env.CommentAPI}${recipeId}`;
 
 const MemoizedLikes = memo(({ likes, comment, share }) => {
   return (
@@ -175,7 +167,6 @@ const CommentsDialog = memo(
                 <MemoizedLikes
                   likes={recipe.likes.length}
                   comment={recipe.comments.length}
-           
                 />
               </div>
               <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-b-2 pb-2 border-gray-200">
@@ -592,7 +583,6 @@ const MemoizedRecipeCard = memo(
                 />
               </p>
             </div>
-
           </div>
           <div className="border-t-2 border-gray-200 ">
             <div className="">

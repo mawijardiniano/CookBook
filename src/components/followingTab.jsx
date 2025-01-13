@@ -14,30 +14,36 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { Button } from "@/components/ui/button";
 
-
-const FollowingList = memo(({ userData, unfollowUser, followUser, handleViewProfile }) => (
-  <TabsContent className="flex w-full flex-col space-y-2" value="followings">
-    {userData?.following?.map((followings) => (
-      <div
-        key={followings._id}
-        className=" bg-gray-100 flex items-center justify-between p-2 border-b w-full border rounded-md"
-      >
-        <div className="flex items-center">
-          <div className="ml-4">
-            <h3 className="font-semibold">{followings?.name}</h3>
+const FollowingList = memo(
+  ({ userData, unfollowUser, followUser, handleViewProfile }) => (
+    <TabsContent className="flex w-full flex-col space-y-2" value="followings">
+      {userData?.following?.map((followings) => (
+        <div
+          key={followings._id}
+          className=" bg-gray-100 flex items-center justify-between p-2 border-b w-full border rounded-md"
+        >
+          <div className="flex items-center">
+            <div className="ml-4">
+              <h3 className="font-semibold">{followings?.name}</h3>
+            </div>
+          </div>
+          <div className="space-x-2">
+            <FollowingListButtons
+              followings={followings}
+              unfollowUser={unfollowUser}
+            />
+            <Button
+              className="text-xs border"
+              onClick={() => handleViewProfile(followings._id)}
+            >
+              View Profile
+            </Button>
           </div>
         </div>
-        <div className="space-x-2">
-          <FollowingListButtons
-            followings={followings}
-            unfollowUser={unfollowUser}
-          />
-          <Button className="text-xs border" onClick={() => handleViewProfile(followings._id)}>View Profile</Button>
-        </div>
-      </div>
-    ))}
-  </TabsContent>
-));
+      ))}
+    </TabsContent>
+  )
+);
 
 const FollowersList = memo(({ userData, followUser, handleViewProfile }) => {
   const isFriend = (followerId) =>
@@ -65,16 +71,22 @@ const FollowersList = memo(({ userData, followUser, handleViewProfile }) => {
                 Follow Back
               </Button>
             ) : (
-                <span className="bg-gray-200 py-2 px-3 text-sm font-medium rounded-md">Friends</span>
+              <span className="bg-gray-200 py-2 px-3 text-sm font-medium rounded-md">
+                Friends
+              </span>
             )}
-            <Button className="text-xs border" onClick={() => handleViewProfile(follower._id)}>View Profile</Button>
+            <Button
+              className="text-xs border"
+              onClick={() => handleViewProfile(follower._id)}
+            >
+              View Profile
+            </Button>
           </div>
         </div>
       ))}
     </TabsContent>
   );
 });
-
 
 const FollowingListButtons = memo(({ followings, unfollowUser }) => (
   <Dialog>
@@ -102,79 +114,77 @@ const FollowingListButtons = memo(({ followings, unfollowUser }) => (
 ));
 
 const FollowingTab = () => {
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [followings, setFollowings] = useState([]);
 
-
-  const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
-  const UNFOLLOW_API = (id) => `http://localhost:5000/api/user/unfollow/${id}`;
-  const FOLLOW = (id) => `http://localhost:5000/api/user/follow/${id}`;
+  const LOGGEDUSER_API = (id) => `${import.meta.env.LOGGEDUSER_API}${id}`;
+  const UNFOLLOW_API = (id) => `${import.meta.env.UNFOLLOW_API}${id}`;
+  const FOLLOW = (id) => `${import.meta.env.FOLLOW}${id}`;
 
   const unfollowUser = async (id) => {
-  const token = localStorage.getItem("authToken");
-  const userIdToUse = jwtDecode(token)?.userId;
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
 
-  try {
-    const response = await axios.post(
-      UNFOLLOW_API(id),
-      { userId: userIdToUse },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    try {
+      const response = await axios.post(
+        UNFOLLOW_API(id),
+        { userId: userIdToUse },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    console.log("User unfollowed", response.data);
+      console.log("User unfollowed", response.data);
 
-    // Update followings in state and localStorage
-    const updatedFollowings = followings.filter(
-      (following) => following._id !== id
-    );
-    setFollowings(updatedFollowings);
-    setUserData((prev) => ({
-      ...prev,
-      following: updatedFollowings,
-    }));
-    localStorage.setItem("followings", JSON.stringify(updatedFollowings));
-  } catch (error) {
-    console.error("Error unfollowing user:", error);
-  }
-};
-
+      // Update followings in state and localStorage
+      const updatedFollowings = followings.filter(
+        (following) => following._id !== id
+      );
+      setFollowings(updatedFollowings);
+      setUserData((prev) => ({
+        ...prev,
+        following: updatedFollowings,
+      }));
+      localStorage.setItem("followings", JSON.stringify(updatedFollowings));
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+    }
+  };
 
   const followUser = async (id) => {
-  const token = localStorage.getItem("authToken");
-  const userIdToUse = jwtDecode(token)?.userId;
+    const token = localStorage.getItem("authToken");
+    const userIdToUse = jwtDecode(token)?.userId;
 
-  try {
-    const response = await axios.post(
-      FOLLOW(id),
-      { userId: userIdToUse },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    try {
+      const response = await axios.post(
+        FOLLOW(id),
+        { userId: userIdToUse },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    console.log("User followed", response.data);
+      console.log("User followed", response.data);
 
-    const updatedFollowings = [...followings, response.data];
-    setFollowings(updatedFollowings);
-    localStorage.setItem("followings", JSON.stringify(updatedFollowings));
-    window.location.reload(); 
-  } catch (error) {
-    console.error("Error following user:", error);
-  }
-};
+      const updatedFollowings = [...followings, response.data];
+      setFollowings(updatedFollowings);
+      localStorage.setItem("followings", JSON.stringify(updatedFollowings));
+      window.location.reload();
+    } catch (error) {
+      console.error("Error following user:", error);
+    }
+  };
 
-useEffect(() => {
-  const storedFollowings = JSON.parse(localStorage.getItem("followings")) || [];
-  setFollowings(storedFollowings);
-}, []);
+  useEffect(() => {
+    const storedFollowings =
+      JSON.parse(localStorage.getItem("followings")) || [];
+    setFollowings(storedFollowings);
+  }, []);
 
-const handleViewProfile = (userId) => {
-  navigate(`/userprofile/${userId}`);
-};
-
+  const handleViewProfile = (userId) => {
+    navigate(`/userprofile/${userId}`);
+  };
 
   const fetchUserData = async (userIdToUse, token) => {
     try {
@@ -237,8 +247,17 @@ const handleViewProfile = (userId) => {
           Followers
         </TabsTrigger>
       </TabsList>
-      <FollowingList userData={userData} unfollowUser={unfollowUser} followUser={followUser} handleViewProfile={handleViewProfile}/>
-      <FollowersList userData={userData} followUser={followUser} handleViewProfile={handleViewProfile}/>
+      <FollowingList
+        userData={userData}
+        unfollowUser={unfollowUser}
+        followUser={followUser}
+        handleViewProfile={handleViewProfile}
+      />
+      <FollowersList
+        userData={userData}
+        followUser={followUser}
+        handleViewProfile={handleViewProfile}
+      />
     </Tabs>
   );
 };

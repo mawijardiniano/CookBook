@@ -105,7 +105,7 @@ const Buttons = memo(({ followUser, unfollowUser }) => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/user/profile/${userId}`
+          `${import.meta.env.USER_PROFILE}${userId}`
         );
         setUserData(response.data);
         setLoading(false);
@@ -305,17 +305,17 @@ const UsersProfile = () => {
   const [isLiked, setIsLiked] = useState({});
   const [isSaved, setIsSaved] = useState({});
   const RECIPEbyUSER_API = (id) =>
-    `http://localhost:5000/api/recipe/get-recipe/${id}`;
+    `${import.meta.env.RECIPEbyUSER_API}${id}`;
   const LikeRecipeAPI = (id) =>
-    `http://localhost:5000/api/recipe/like-recipe/${id}`;
+    `${import.meta.env.LikeRecipeAPI}${id}`;
   const UnLikeRecipeAPI = (id) =>
-    `http://localhost:5000/api/recipe/unlike-recipe/${id}`;
+    `${import.meta.env.UnlikeRecipeAPI}${id}`;
   const saveRecipeAPI = (id) =>
-    `http://localhost:5000/api/recipe/save-recipe/${id}`;
+    `${import.meta.env.saveRecipeAPI}${id}`;
   const UnsaveRecipeAPI = (id) =>
-    `http://localhost:5000/api/recipe/unsave-recipe/${id}`;
-  const UNFOLLOW_API = (id) => `http://localhost:5000/api/user/unfollow/${id}`;
-  const FOLLOW = (id) => `http://localhost:5000/api/user/follow/${id}`;
+    `${import.meta.env.UnsaveRecipeAPI}${id}`;
+  const UNFOLLOW_API = (id) => `${import.meta.env.UNFOLLOW_API}${id}`;
+  const FOLLOW = (id) => `${import.meta.env.FOLLOW}${id}`;
 
   const fetchRecipe = async (id) => {
     try {
@@ -330,7 +330,7 @@ const UsersProfile = () => {
   };
 
   const USERPROFILE_API = (id) =>
-    `http://localhost:5000/api/user/profile/${id}`;
+    `${import.meta.env.USERPROFILE}${id}`;
 
   const fetchUserData = async (userId) => {
     try {

@@ -52,8 +52,8 @@ const EditProfileButton = () => {
   const [name, setName] = useState("");
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
-  const EDITUSER_API = (id) => `http://localhost:5000/api/user/edit/${id}`;
-  const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
+  const EDITUSER_API = (id) => `${import.meta.env.EDITUSER_API}${id}`;
+  const LOGGEDUSER_API = (id) => `${import.meta.env.LOGGEDUSER_API}${id}`;
 
   const handleNameChange = useCallback((value) => {
     setName(value);

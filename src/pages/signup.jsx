@@ -12,7 +12,7 @@ const Signup = () => {
     password: '',
   });
 
-  const SIGNUP_API = "http://localhost:5000/api/user/signup";
+  const SIGNUP_API = `${import.meta.env.SIGNUP_API}`;
 
   const navigate = useNavigate();
 

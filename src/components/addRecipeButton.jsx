@@ -18,9 +18,8 @@ import { useNavigate } from "react-router-dom";
 import "../App.css";
 import recipeTags from "../components/tags.json";
 
-const ADDRECIPE_API = (id) =>
-  `http://localhost:5000/api/recipe/create-recipe/${id}`;
-const LOGGEDUSER_API = (id) => `http://localhost:5000/api/user/user/${id}`;
+const ADDRECIPE_API = (id) => `${import.meta.env.ADDRECIPE_API}${id}`;
+const LOGGEDUSER_API = (id) => `${import.meta.env.LOGGEDUSER_API}${id}`;
 
 const AddRecipeButton = () => {
   const [recipeFormData, setRecipeFormData] = useState({
@@ -154,7 +153,10 @@ const AddRecipeButton = () => {
       navigate("/profile");
       window.location.reload();
     } catch (error) {
-      console.error("Error adding recipe:", error?.response?.data || error.message);
+      console.error(
+        "Error adding recipe:",
+        error?.response?.data || error.message
+      );
     }
   };
 
@@ -303,7 +305,11 @@ const AddRecipeButton = () => {
             </div>
 
             <DialogFooter>
-              <Button type="submit" className="bg-black text-white" style={{backgroundColor: "black"}}>
+              <Button
+                type="submit"
+                className="bg-black text-white"
+                style={{ backgroundColor: "black" }}
+              >
                 Save Recipe
               </Button>
             </DialogFooter>
