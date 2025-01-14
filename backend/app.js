@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 
 // CORS configuration
 const corsOptions = {
-  origin: 'http://localhost:5173', // Update this to match the frontend origin
+  origin: 'https://cookbookweb.onrender.com', // Update this to match the frontend origin
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,  // If you're using cookies or authentication tokens
