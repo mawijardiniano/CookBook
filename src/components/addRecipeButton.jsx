@@ -18,8 +18,8 @@ import { useNavigate } from "react-router-dom";
 import "../App.css";
 import recipeTags from "../components/tags.json";
 
-const ADDRECIPE_API = (id) => `${import.meta.env.ADDRECIPE_API}${id}`;
-const LOGGEDUSER_API = (id) => `${import.meta.env.LOGGEDUSER_API}${id}`;
+const ADDRECIPE_API = (id) => `${import.meta.env.VITE_ADDRECIPE_API}${id}`;
+const LOGGEDUSER_API = (id) => `${import.meta.env.VITE_LOGGEDUSER_API}${id}`;
 
 const AddRecipeButton = () => {
   const [recipeFormData, setRecipeFormData] = useState({

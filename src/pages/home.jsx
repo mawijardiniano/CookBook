@@ -24,14 +24,14 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const GetRecipeAPI = `${import.meta.env.GetRecipeAPI}`;
-const LikeRecipeAPI = (id) => `${import.meta.env.LikeRecipeAPI}${id}`;
-const UnLikeRecipeAPI = (id) => `${import.meta.env.UnLikeRecipeAPI}${id}`;
-const LOGGEDUSER_API = (userId) => `${import.meta.env.LOGGEDUSER_API}${userId}`;
-const saveRecipeAPI = (id) => `${import.meta.env.saveRecipeAPI}${id}`;
-const UnsaveRecipeAPI = (id) => `${import.meta.env.UnsaveRecipeAPI}${id}`;
-const GetCommentAPI = (recipeId) => `${import.meta.env.GetCommentAPI}${recipeId}`;
-const CommentAPI = (recipeId) => `${import.meta.env.CommentAPI}${recipeId}`;
+const GetRecipeAPI = `${import.meta.env.VITE_GetRecipeAPI}`;
+const LikeRecipeAPI = (id) => `${import.meta.env.VITE_LikeRecipeAPI}${id}`;
+const UnLikeRecipeAPI = (id) => `${import.meta.env.VITE_UnLikeRecipeAPI}${id}`;
+const LOGGEDUSER_API = (userId) => `${import.meta.env.VITE_LOGGEDUSER_API}${userId}`;
+const saveRecipeAPI = (id) => `${import.meta.env.VITE_saveRecipeAPI}${id}`;
+const UnsaveRecipeAPI = (id) => `${import.meta.env.VITE_UnsaveRecipeAPI}${id}`;
+const GetCommentAPI = (recipeId) => `${import.meta.env.VITE_GetCommentAPI}${recipeId}`;
+const CommentAPI = (recipeId) => `${import.meta.env.VITE_CommentAPI}${recipeId}`;
 
 const MemoizedLikes = memo(({ likes, comment, share }) => {
   return (

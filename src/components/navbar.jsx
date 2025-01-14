@@ -14,9 +14,9 @@ const Navbar = () => {
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
-  const LOGGEDUSER_API = (id) => `${import.meta.env.LOGGEDUSER_API}${id}`;
+  const LOGGEDUSER_API = (id) => `${import.meta.env.VITE_LOGGEDUSER_API}${id}`;
   const FILTERUSER_API = (name) =>
-    `${import.meta.env.FILTERUSER_API}?name=${encodeURIComponent(name)}`;
+    `${import.meta.env.VITE_FILTERUSER_API}?name=${encodeURIComponent(name)}`;
 
   const handleSearchChange = async (e) => {
     const searchQuery = e.target.value;

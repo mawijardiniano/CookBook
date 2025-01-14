@@ -12,7 +12,7 @@ const Signup = () => {
     password: '',
   });
 
-  const SIGNUP_API = `${import.meta.env.SIGNUP_API}`;
+  const SIGNUP_API = `${import.meta.env.VITE_SIGNUP_API}`;
 
   const navigate = useNavigate();
 

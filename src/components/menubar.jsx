@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 export function NameMenubar() {
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
-  const LOGGEDUSER_API = (id) => `${import.meta.env.LOGGEDUSER_API}${id}`;
+  const LOGGEDUSER_API = (id) => `${import.meta.env.VITE_LOGGEDUSER_API}${id}`;
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");

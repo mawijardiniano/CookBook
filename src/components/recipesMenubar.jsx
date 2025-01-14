@@ -44,11 +44,11 @@ export function RecipesMenubar({ recipeId }) {
   const [selectedRecipe, setSelectedRecipe] = useState(null)
   const navigate = useNavigate();
 
-  const LOGGEDUSER_API = (id) => `${import.meta.env.LOGGEDUSER_API}${id}`;
+  const LOGGEDUSER_API = (id) => `${import.meta.env.VITE_LOGGEDUSER_API}${id}`;
   const DELETERECIPE_API = (id) =>
-    `${import.meta.env.DELETERECIPE_API}${id}`;
+    `${import.meta.env.VITE_DELETERECIPE_API}${id}`;
   const RECIPEbyUSER_API = (id) =>
-    `${import.meta.env.RECIPEbyUSER_API}${id}`;
+    `${import.meta.env.VITE_RECIPEbyUSER_API}${id}`;
 
   const handleEditClick = (recipeId) => {
     setSelectedRecipe(recipeId);

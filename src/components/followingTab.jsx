@@ -118,9 +118,9 @@ const FollowingTab = () => {
   const [userData, setUserData] = useState(null);
   const [followings, setFollowings] = useState([]);
 
-  const LOGGEDUSER_API = (id) => `${import.meta.env.LOGGEDUSER_API}${id}`;
-  const UNFOLLOW_API = (id) => `${import.meta.env.UNFOLLOW_API}${id}`;
-  const FOLLOW = (id) => `${import.meta.env.FOLLOW}${id}`;
+  const LOGGEDUSER_API = (id) => `${import.meta.env.VITE_LOGGEDUSER_API}${id}`;
+  const UNFOLLOW_API = (id) => `${import.meta.env.VITE_UNFOLLOW_API}${id}`;
+  const FOLLOW = (id) => `${import.meta.env.VITE_FOLLOW}${id}`;
 
   const unfollowUser = async (id) => {
     const token = localStorage.getItem("authToken");

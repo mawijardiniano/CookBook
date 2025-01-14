@@ -42,7 +42,7 @@ const ProfileComponent = ({
         <div className="p-16 bg-gray-200 rounded-full" />
         <div className="flex justify-center flex-col space-y-2">
           <UsernameProfile userData={userData} />
-          <Buttons followUser={followUser} unfollowUser={unfollowUser}/>
+          <Buttons followUser={followUser} unfollowUser={unfollowUser} />
         </div>
       </div>
       <div className="py-6">
@@ -99,19 +99,19 @@ const Buttons = memo(({ followUser, unfollowUser }) => {
   const loggedUserId = token ? jwtDecode(token)?.userId : null;
   const { userId } = useParams();
   const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.USER_PROFILE}${userId}`
+          `${import.meta.env.VITE_USER_PROFILE}${userId}`
         );
         setUserData(response.data);
-        setLoading(false);
+
       } catch (error) {
         console.error("Error fetching user data:", error);
-        setLoading(false);
+
       }
     };
 
@@ -165,7 +165,9 @@ const Buttons = memo(({ followUser, unfollowUser }) => {
             <FaUserCog size={16} />
           </MenubarTrigger>
           <MenubarContent>
-            <MenubarItem  onClick={() => unfollowUser?.(userData._id)}>Unfollow</MenubarItem>
+            <MenubarItem onClick={() => unfollowUser?.(userData._id)}>
+              Unfollow
+            </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
@@ -305,17 +307,15 @@ const UsersProfile = () => {
   const [isLiked, setIsLiked] = useState({});
   const [isSaved, setIsSaved] = useState({});
   const RECIPEbyUSER_API = (id) =>
-    `${import.meta.env.RECIPEbyUSER_API}${id}`;
-  const LikeRecipeAPI = (id) =>
-    `${import.meta.env.LikeRecipeAPI}${id}`;
+    `${import.meta.env.VITE_RECIPEbyUSER_API}${id}`;
+  const LikeRecipeAPI = (id) => `${import.meta.env.VITE_LikeRecipeAPI}${id}`;
   const UnLikeRecipeAPI = (id) =>
-    `${import.meta.env.UnlikeRecipeAPI}${id}`;
-  const saveRecipeAPI = (id) =>
-    `${import.meta.env.saveRecipeAPI}${id}`;
+    `${import.meta.env.VITE_UnlikeRecipeAPI}${id}`;
+  const saveRecipeAPI = (id) => `${import.meta.env.VITE_saveRecipeAPI}${id}`;
   const UnsaveRecipeAPI = (id) =>
-    `${import.meta.env.UnsaveRecipeAPI}${id}`;
-  const UNFOLLOW_API = (id) => `${import.meta.env.UNFOLLOW_API}${id}`;
-  const FOLLOW = (id) => `${import.meta.env.FOLLOW}${id}`;
+    `${import.meta.env.VITE_UnsaveRecipeAPI}${id}`;
+  const UNFOLLOW_API = (id) => `${import.meta.env.VITE_UNFOLLOW_API}${id}`;
+  const FOLLOW = (id) => `${import.meta.env.VITE_FOLLOW}${id}`;
 
   const fetchRecipe = async (id) => {
     try {
@@ -329,8 +329,7 @@ const UsersProfile = () => {
     }
   };
 
-  const USERPROFILE_API = (id) =>
-    `${import.meta.env.USERPROFILE}${id}`;
+  const USERPROFILE_API = (id) => `${import.meta.env.VITE_USER_PROFILE}${id}`;
 
   const fetchUserData = async (userId) => {
     try {
@@ -348,7 +347,7 @@ const UsersProfile = () => {
   const unfollowUser = async (id) => {
     const token = localStorage.getItem("authToken");
     const userIdToUse = jwtDecode(token)?.userId;
-  
+
     try {
       const response = await axios.post(
         UNFOLLOW_API(id),
@@ -357,9 +356,9 @@ const UsersProfile = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+
       console.log("User unfollowed", response.data);
-  
+
       // Update followings in state and localStorage
       const updatedFollowings = followings.filter(
         (following) => following._id !== id
@@ -375,7 +374,6 @@ const UsersProfile = () => {
       console.error("Error unfollowing user:", error);
     }
   };
-  
 
   const followUser = async (id) => {
     const token = localStorage.getItem("authToken");
@@ -495,7 +493,7 @@ const UsersProfile = () => {
 
   return (
     <ProfileComponent
-    unfollowUser={unfollowUser}
+      unfollowUser={unfollowUser}
       followUser={followUser}
       userData={userData}
       totalLikes={totalLikes}

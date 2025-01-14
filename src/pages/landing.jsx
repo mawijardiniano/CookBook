@@ -9,8 +9,8 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 export default function Landing() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const LOGIN_API = import.meta.env.LOGIN_API;
-  const GOOGLE_LOGIN = import.meta.env.GOOGLE_LOGIN;
+  const LOGIN_API = import.meta.env.VITE_LOGIN_API;
+  const GOOGLE_LOGIN = import.meta.env.VITE_GOOGLE_LOGIN;
   const navigate = useNavigate();
 
   const handleEmailChange = (value) => {
