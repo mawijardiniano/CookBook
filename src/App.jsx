@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { scan } from "react-scan";
 import { Routes, Route, BrowserRouter, useLocation } from "react-router-dom";
 import Landing from "./pages/landing";
 import Signup from "./pages/signup";
@@ -18,13 +17,6 @@ function MainApp() {
   const hideSidebar =
     location.pathname === "/" || location.pathname === "/signup";
 
-  // useEffect(() => {
-  //   scan({
-  //     enabled: true,
-  //     log: true,
-  //     highlight: true,
-  //   });
-  // }, []);
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
