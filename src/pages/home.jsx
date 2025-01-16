@@ -169,7 +169,7 @@ const CommentsDialog = memo(
                   comment={recipe.comments.length}
                 />
               </div>
-              <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-b-2 pb-2 border-gray-200">
+              <div className="flex flex-row justify-between px-6 md:px-20 pt-2 border-t-2 border-b-2 pb-2 border-gray-200">
                 <div className="flex flex-row space-x-2 items-center">
                   {isLiked[recipe._id] ? (
                     <FaHeart
@@ -320,7 +320,7 @@ const CommentButtonDialog = memo(
                   comment={recipe.comments.length}
                 />
               </div>
-              <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-b-2 pb-2 border-gray-200">
+              <div className="flex flex-row justify-between px-6 md:px-20 pt-2 border-t-2 border-b-2 pb-2 border-gray-200">
                 <div className="flex flex-row space-x-2 items-center">
                   {isLiked[recipe._id] ? (
                     <FaHeart
@@ -549,7 +549,7 @@ const MemoizedRecipeCard = memo(
               comment={recipe.comments.length}
             />
           </div>
-          <div className="flex flex-row justify-between px-20 pt-2 border-t-2 pb-2 border-gray-200">
+          <div className="flex flex-row justify-between px-6 md:px-20 pt-2 border-t-2 pb-2 border-gray-200">
             <div className="flex flex-row space-x-2 items-center">
               {isLiked[recipe._id] ? (
                 <FaHeart
@@ -809,7 +809,7 @@ const Home = () => {
 
   return (
     <div className="flex-1 flex flex-col w-full py-20 px-10">
-      <div className="px-6">
+      <div className="md:px-6">
         <MemoizedRecipe
           handleViewProfile={handleViewProfile}
           recipes={sortedRecipes}
