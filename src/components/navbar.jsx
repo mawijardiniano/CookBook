@@ -101,18 +101,17 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 bg-white shadow px-6 py-4 z-50 flex flex-row justify-between">
+      <nav className="fixed top-0 right-0 left-0 bg-white shadow md:px-6 py-4 z-50 flex flex-row justify-between">
         <HamburgerButton toggleSidebar={toggleSidebar} />
         <div className="flex items-center space-x-3">
-          <h1 className="text-2xl font-bold flex items-center space-x-2">
+          <h1 className="pl-14 md:pl-0 md:text-2xl font-bold flex items-center space-x-2">
             <FaBookReader className="text-black" />
             <span className="text-black">CookBook</span>
           </h1>
         </div>
 
-        <div className="flex items-center justify-end space-x-6 relative">
-          <div>
+        <div className="flex items-center justify-end md:space-x-6 relative">
+          <div className="w-20 md:w-full">
             <Input
               type="text"
               value={query}
@@ -138,12 +137,11 @@ const Navbar = () => {
             </div>
           )}
 
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center md:space-x-6">
             <Notification
               className="text-gray-500 hover:text-gray-700"
-              size={24}
+              size={20}
             />
-            <FaComment className="text-gray-500 hover:text-gray-700" size={24} />
             <NameMenubar />
           </div>
         </div>

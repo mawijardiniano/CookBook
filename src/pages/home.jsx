@@ -808,7 +808,7 @@ const Home = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full py-20 px-10">
+    <div className="flex-1 flex flex-col w-full py-20 px-4 md:px-10">
       <div className="md:px-6">
         <MemoizedRecipe
           handleViewProfile={handleViewProfile}

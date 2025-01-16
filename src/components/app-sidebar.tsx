@@ -32,12 +32,11 @@ export function AppSidebar() {
   return (
     <>
       <div
-        className={`fixed top-0 left-0 h-full bg-white z-40 transform ${
+        className={`fixed pt-10 left-0 h-full bg-white z-40 transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:static w-64 transition-transform duration-300 ease-in-out`}
       >
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-semibold">App Sidebar</h2>
           <button onClick={toggleSidebar} className="lg:hidden">
             <span className="text-xl">×</span>
           </button>
