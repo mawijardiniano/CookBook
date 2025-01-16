@@ -37,9 +37,9 @@ const ProfileComponent = ({
   unfollowUser,
 }) => {
   return (
-    <div className="py-28 px-12">
+    <div className="py-20 px-8 md:py-28 md:px-12">
       <div className="flex flex-row w-full space-x-6">
-        <div className="p-16 bg-gray-200 rounded-full" />
+        <div className="p-12 md:p-16 bg-gray-200 rounded-full" />
         <div className="flex justify-center flex-col space-y-2">
           <UsernameProfile userData={userData} />
           <Buttons followUser={followUser} unfollowUser={unfollowUser} />
@@ -59,7 +59,7 @@ const ProfileComponent = ({
   );
 };
 
-const UsernameProfile = memo(({ userData }) => <p>{userData?.name}</p>);
+const UsernameProfile = memo(({ userData }) => <p className="font-medium">{userData?.name}</p>);
 
 const MemoizedLikes = memo(({ likes }) => {
   return (
@@ -252,7 +252,7 @@ const MemoizedRecipeLists = memo(
               <div className="flex flex-row items-center space-x-1">
                 <MemoizedLikes likes={recipe.likes.length} />
               </div>
-              <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
+              <div className="flex flex-row justify-between px-8 md:px-20 pt-2 border-t-2 border-gray-200">
                 <div className="flex flex-row space-x-2 items-center">
                   {isLiked[recipe._id] ? (
                     <FaHeart
@@ -276,10 +276,7 @@ const MemoizedRecipeLists = memo(
                   <p className="text-sm">Comment</p>
                 </div>
 
-                <div className="flex flex-row space-x-2 items-center">
-                  <FaShare size={20} />
-                  <p className="text-sm">Share</p>
-                </div>
+            
               </div>
             </div>
           ))
