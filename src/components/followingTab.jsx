@@ -237,7 +237,7 @@ const FollowingTab = () => {
   return (
     <Tabs
       defaultValue="followings"
-      className="w-full p-8 flex  flex-col rounded-md"
+      className="w-full md:p-8 flex  flex-col rounded-md"
     >
       <TabsList className="flex w-full border">
         <TabsTrigger className=" w-full bg-gray-100" value="followings">

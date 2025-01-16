@@ -18,7 +18,7 @@ import { RecipesMenubar } from "../components/recipesMenubar";
 const MemoizedUsername = memo(({ name }) => {
   return (
     <div className="flex flex-col justify-center space-y-2">
-      <p className="font-bold text-xl">{name}</p>
+      <p className="font-bold text-lg md:text-xl">{name}</p>
       <EditProfileButton className="bg-gray-200 py-2 px-6 rounded-[5px] self-start" />
     </div>
   );
@@ -103,7 +103,7 @@ const MemoizedLikedRecipes = memo(
                 <div className="flex flex-row items-center space-x-1">
                   <MemoizedLikes likes={recipe.likes.length} />
                 </div>
-                <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
+                <div className="flex flex-row justify-between px-8 md:px-20 pt-2 border-t-2 border-gray-200">
                   <div className="flex flex-row space-x-2 items-center">
                     {isLiked[recipe._id] ? (
                       <FaHeart
@@ -127,10 +127,6 @@ const MemoizedLikedRecipes = memo(
                     <p className="text-sm">Comment</p>
                   </div>
 
-                  <div className="flex flex-row space-x-2 items-center">
-                    <FaShare size={20} />
-                    <p className="text-sm">Share</p>
-                  </div>
                 </div>
               </div>
             ))
@@ -189,7 +185,7 @@ const MemoizedSavedRecipes = memo(
                 <div className="flex flex-row items-center space-x-1">
                   <MemoizedLikes likes={recipe.likes.length} />
                 </div>
-                <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
+                <div className="flex flex-row justify-between px-8 md:px-20 pt-2 border-t-2 border-gray-200">
                   <div className="flex flex-row space-x-2 items-center">
                     {isLiked[recipe._id] ? (
                       <FaHeart
@@ -211,11 +207,6 @@ const MemoizedSavedRecipes = memo(
                   <div className="flex flex-row space-x-2 items-center">
                     <FaComment size={20} />
                     <p className="text-sm">Comment</p>
-                  </div>
-
-                  <div className="flex flex-row space-x-2 items-center">
-                    <FaShare size={20} />
-                    <p className="text-sm">Share</p>
                   </div>
                 </div>
               </div>
@@ -313,7 +304,7 @@ const MemoizedRecipeLists = memo(
               <div className="flex flex-row items-center space-x-1">
                 <MemoizedLikes likes={recipe.likes.length} />
               </div>
-              <div className="flex flex-row justify-between px-20 pt-2 border-t-2 border-gray-200">
+              <div className="flex flex-row justify-between px-8 md:px-20 pt-2 border-t-2 border-gray-200">
                 <div className="flex flex-row space-x-2 items-center">
                   {isLiked[recipe._id] ? (
                     <FaHeart
@@ -507,10 +498,10 @@ export default function Profile() {
   );
 
   return (
-    <div className="py-28 px-12">
+    <div className="py-20 md:py-28 md:px-12">
       <div className="flex-1 flex flex-col">
         <div className="p-6 flex flex-row space-x-6">
-          <div className="p-16 rounded-full bg-gray-200"></div>
+          <div className="p-12 md:p-16 rounded-full bg-gray-200"></div>
           <MemoizedUsername name={userData?.name} />
         </div>
         <div className="flex flex-row space-x-12 px-6">

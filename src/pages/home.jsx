@@ -96,24 +96,24 @@ const CommentsDialog = memo(
           <p className="text-xs text-gray-500">No comments available.</p>
         )}
         <DialogContent
-          className="bg-white"
-          style={{ width: "1000px", maxWidth: "70%" }}
+          className="bg-white rounded-lg"
+          style={{ width: "100%", maxWidth: "90%", minWidth: "320px" }}
         >
           <DialogDescription>
             <div className="mb-4">
-              <div className="flex flex-row space-x-2 items-center">
-                <div className="p-6 rounded-full bg-gray-200" />
+              <div className="flex flex-row items-center space-x-2">
+                <div className="p-4 md:p-6 rounded-full bg-gray-200" />
                 <div className="flex flex-row items-center justify-between w-full">
                   <div>
                     <p
-                      className="text-sm font-medium"
-                      onClick={() => handleViewProfile(following_id)}
+                      className="text-sm md:text-base font-medium"
+                      onClick={() => handleViewProfile(recipe.createdBy?._id)}
                     >
                       {recipe.createdBy?.name || "Null"}
                     </p>
-                    <p className="text-[12px]">{recipe.timeSince}</p>
+                    <p className="text-xs md:text-sm">{recipe.timeSince}</p>
                   </div>
-                  <div className="pr-8">
+                  <div className="pr-4 md:pr-8">
                     {isSaved[recipe._id] ? (
                       <FaBookmark
                         onClick={() => handleSaveRecipe(recipe._id)}
@@ -121,46 +121,46 @@ const CommentsDialog = memo(
                         size={20}
                       />
                     ) : (
-                      <>
-                        <FaRegBookmark
-                          onClick={() => handleSaveRecipe(recipe._id)}
-                          size={20}
-                        />
-                      </>
+                      <FaRegBookmark
+                        onClick={() => handleSaveRecipe(recipe._id)}
+                        size={20}
+                      />
                     )}
                   </div>
                 </div>
               </div>
               <div className="pt-4">
-                <p className="font-medium text-lg">{recipe.title}</p>
-                <p>{recipe.description}</p>
-                <h4 className="font-medium">Ingredients:</h4>
-                <ul className="text-sm list-disc pl-4">
+                <p className="font-medium text-lg md:text-xl">
+                  {recipe.title}
+                </p>
+                <p className="text-sm md:text-base">{recipe.description}</p>
+                <h4 className="font-medium mt-4">Ingredients:</h4>
+                <ul className="text-sm md:text-base list-disc pl-4">
                   {Array.isArray(recipe.ingredients) &&
                     recipe.ingredients.map((ingredient, index) => (
                       <li key={index}>{ingredient.name}</li>
                     ))}
                 </ul>
-                <h4 className="font-medium ">Instructions:</h4>
-                <ol className="text-sm list-decimal pl-4">
+                <h4 className="font-medium mt-4">Instructions:</h4>
+                <ol className="text-sm md:text-base list-decimal pl-4">
                   {Array.isArray(recipe.instructions) &&
                     recipe.instructions.map((instruction, index) => (
                       <li key={index}>{instruction.name}</li>
                     ))}
                 </ol>
-                <div className="mt-2">
+                <div className="mt-4">
                   <h4 className="font-medium">Tags:</h4>
-                  <ol className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {Array.isArray(recipe.tags) &&
                       recipe.tags.map((tag, index) => (
-                        <li
+                        <span
                           key={index}
-                          className="text-xs font-medium bg-gray-200 px-2 rounded-md"
+                          className="text-xs md:text-sm font-medium bg-gray-200 px-2 py-1 rounded-md"
                         >
                           {tag}
-                        </li>
+                        </span>
                       ))}
-                  </ol>
+                  </div>
                 </div>
               </div>
               <div className="flex flex-row items-center space-x-1 py-2">
@@ -169,7 +169,7 @@ const CommentsDialog = memo(
                   comment={recipe.comments.length}
                 />
               </div>
-              <div className="flex flex-row justify-between px-6 md:px-20 pt-2 border-t-2 border-b-2 pb-2 border-gray-200">
+              <div className="flex flex-row justify-between px-4 md:px-6 py-2 border-t-2 border-b-2 border-gray-200">
                 <div className="flex flex-row space-x-2 items-center">
                   {isLiked[recipe._id] ? (
                     <FaHeart
@@ -183,30 +183,32 @@ const CommentsDialog = memo(
                         onClick={() => handleLikeRecipe(recipe._id)}
                         size={20}
                       />
-                      <p className="text-sm">Like</p>
+                      <p className="text-xs md:text-sm">Like</p>
                     </>
                   )}
                 </div>
 
                 <div className="flex flex-row space-x-2 items-center">
                   <FaComment size={20} />
-                  <p className="text-sm">Comment</p>
+                  <p className="text-xs md:text-sm">Comment</p>
                 </div>
               </div>
             </div>
 
-            <div className="overflow-y-auto max-h-28 hide-scrollbar">
+            <div className="overflow-y-auto max-h-28 md:max-h-48 hide-scrollbar">
               {comments && comments.length > 0 ? (
                 comments.map((comment) => (
-                  <div key={comment._id} className="py-1  border-gray-200">
-                    <div className="bg-gray-200 rounded-md px-4 py-1">
-                      <p className="text-xs font-medium">
+                  <div
+                    key={comment._id}
+                    className="py-2 border-b border-gray-200"
+                  >
+                    <div className="bg-gray-200 rounded-md px-4 py-2">
+                      <p className="text-xs md:text-sm font-medium">
                         {comment.user?.name}
                       </p>
-                      <p className="text-xs">{comment.text}</p>
+                      <p className="text-xs md:text-sm">{comment.text}</p>
                     </div>
-
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs md:text-sm text-gray-500">
                       {timeSince(comment.createdOn)}
                     </p>
                   </div>
@@ -229,6 +231,7 @@ const CommentsDialog = memo(
   }
 );
 
+
 const CommentButtonDialog = memo(
   ({
     recipe,
@@ -247,8 +250,8 @@ const CommentButtonDialog = memo(
           <FaComment size={16} /> Comment
         </DialogTrigger>
         <DialogContent
-          className="bg-white"
-          style={{ width: "1000px", maxWidth: "70%" }}
+          className="bg-white rounded-lg"
+          style={{ width: "100%", maxWidth: "90%", minWidth: "320px" }}
         >
           <DialogDescription>
             <div className="mb-4">

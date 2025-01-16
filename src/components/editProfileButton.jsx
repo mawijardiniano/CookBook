@@ -15,19 +15,20 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const MemoizedDialogHeader = memo(() => (
-  <DialogHeader>
-    <DialogTitle>Edit profile</DialogTitle>
-    <DialogDescription>
+  <DialogHeader className="flex flex-col items-start space-y-2">
+    <DialogTitle className="text-lg md:text-xl font-semibold text-left">Edit profile</DialogTitle>
+    <DialogDescription className="text-sm md:text-base text-gray-600 text-left">
       Make changes to your profile here. Click save when you're done.
     </DialogDescription>
   </DialogHeader>
 ));
 
+
 const MemoizedDialogFooter = memo(({ onSave }) => (
   <DialogFooter>
     <Button
       type="submit"
-      className="py-2 px-6 rounded-[5px] self-start text-white"
+      className="py-2 px-6 rounded-[5px] text-white"
       style={{ backgroundColor: "black" }}
       onClick={onSave}
     >
@@ -149,12 +150,12 @@ const EditProfileButton = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="bg-gray-300 py-2 px-6 rounded-[5px] self-start">
+        <Button className="bg-gray-300 py-2 rounded-[5px] self-start md:px-6">
           Edit Profile
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-white">
-        <MemoizedDialogHeader />
+      <DialogContent className="md:max-w-[425px] bg-white">
+        <MemoizedDialogHeader/>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <MemoizedInput
