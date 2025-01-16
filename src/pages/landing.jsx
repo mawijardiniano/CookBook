@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import LandingLogo from "../assets/landingLOGO.jpg";
 import { Input } from "@/components/ui/input";
+import { FaGoogle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import GoogleLoginButton from "../components/googleLogin";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
 export default function Landing() {
@@ -18,36 +20,68 @@ export default function Landing() {
   const handleLogin = async () => {
     try {
       const response = await axios.post(LOGIN_API, { email, password });
-      const { token, userId, name, email } = response.data.data || {};
 
-      if (token && userId) {
+      console.log("Response from backend:", response.data);
+
+      if (response.data && response.data.data) {
+        const { token, userId, name, email } = response.data.data;
+        if (!token || !userId) {
+          console.error("Token or user data is missing");
+          return;
+        }
+
         localStorage.setItem("authToken", token);
         localStorage.setItem("user", JSON.stringify({ userId, name, email }));
+
+        console.log("Login successful, token and user data stored:", {
+          token,
+          user: { userId, name, email },
+        });
+
         navigate("/home");
       } else {
-        console.error("Token or userId missing");
+        console.error("Unexpected response format:", response.data);
       }
     } catch (error) {
-      console.error(error.response?.data?.message || error.message);
+      console.error(
+        "Login failed:",
+        error.response?.data?.message || error.message
+      );
     }
   };
 
-  const createAccount = () => navigate("/signup");
+  const createAccount = () => {
+    navigate("/signup");
+  };
 
   const handleLoginSuccess = async (response) => {
     try {
-      const { data } = await axios.post(GOOGLE_LOGIN, { token: response.credential });
+      const token = response.credential;
+
+      const { data } = await axios.post(GOOGLE_LOGIN, {
+        token: token,
+      });
+
       localStorage.setItem("authToken", data.token);
-      localStorage.setItem("googleUser", JSON.stringify(data));
+      localStorage.setItem(
+        "googleUser",
+        JSON.stringify({ name: data.name, email: data.email, _id: data._id })
+      );
+
+      const googleUser = JSON.parse(localStorage.getItem("googleUser"));
+
+      console.log(googleUser);
+
       navigate("/home");
     } catch (error) {
-      console.error(error);
+      console.error("Login failed:", error);
+      alert("Login failed. Please try again.");
     }
   };
 
   const handleLoginFailure = (error) => {
-    console.error(error);
-    alert("Google Login failed. Please try again.");
+    console.error("Login Failed:", error);
+    alert("Login failed. Please try again.");
   };
 
   return (
@@ -60,12 +94,13 @@ export default function Landing() {
         />
       </div>
 
-  
       <div className="flex items-center justify-center md:w-1/2 w-full p-4 md:p-12">
         <div className="w-full max-w-md space-y-6">
-          <p className="text-3xl md:text-4xl font-bold text-center">Welcome to CookBook</p>
+          <p className="text-3xl md:text-4xl font-bold">
+            Welcome to CookBook
+          </p>
 
-          <div className="space-y-4">
+          <div className="space-y-1">
             <Input
               type="email"
               placeholder="Email"
