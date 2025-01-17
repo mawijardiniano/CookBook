@@ -28,16 +28,18 @@ const MemoizedUsername = memo(({ name }) => {
 const MemoizedLikes = memo(({ likes, comment }) => {
   return (
     <div className="flex flex-row justify-between w-full px-6">
-     {likes > 0 && (
-      <div className="flex items-center space-x-1">
-        <FaHeart size={16} color="red" />
-        <p className="text-sm">{likes}</p>
-      </div>
-     )}
+      {likes > 0 && (
+        <div className="flex items-center space-x-1">
+          <FaHeart size={16} color="red" />
+          <p className="text-sm">{likes}</p>
+        </div>
+      )}
       {comment > 0 && (
         <div className="flex items-center space-x-1">
           <FaComment />
-          <p className="text-sm">{comment} {comment === 1 ? 'comment' : 'comments'}</p>
+          <p className="text-sm">
+            {comment} {comment === 1 ? "comment" : "comments"}
+          </p>
         </div>
       )}
     </div>
@@ -112,7 +114,10 @@ const MemoizedLikedRecipes = memo(
                 <h3 className="mt-4 text-lg font-semibold">{recipe.title}</h3>
                 <p className="text-sm">{recipe.description}</p>
                 <div className="flex flex-row items-center space-x-1">
-                  <MemoizedLikes likes={recipe.likes.length}   comment={recipe.comments.length} />
+                  <MemoizedLikes
+                    likes={recipe.likes.length}
+                    comment={recipe.comments.length}
+                  />
                 </div>
                 <div className="flex flex-row justify-between px-8 md:px-20 pt-2 border-t-2 border-gray-200">
                   <div className="flex flex-row space-x-2 items-center">
@@ -193,7 +198,10 @@ const MemoizedSavedRecipes = memo(
                 <h3 className="mt-4 text-lg font-semibold">{recipe.title}</h3>
                 <p className="text-sm">{recipe.description}</p>
                 <div className="flex flex-row items-center space-x-1">
-                  <MemoizedLikes likes={recipe.likes.length}   comment={recipe.comments.length} />
+                  <MemoizedLikes
+                    likes={recipe.likes.length}
+                    comment={recipe.comments.length}
+                  />
                 </div>
                 <div className="flex flex-row justify-between px-8 md:px-20 pt-2 border-t-2 border-gray-200">
                   <div className="flex flex-row space-x-2 items-center">
@@ -233,122 +241,147 @@ const MemoizedSavedRecipes = memo(
 );
 
 const MemoizedRecipeLists = memo(
-  ({ recipes, handleLikeRecipe, isLiked, handleSaveRecipe, isSaved }) => (
-    <TabsContent value="recipes" className="">
-      <div className="flex justify-end items-end w-full pb-4">
-        <MemoizedAddRecipeButton />
-      </div>
-      <div className="space-y-4">
-        {recipes.length > 0 ? (
-          recipes.map((recipe) => (
-            <div
-              className="w-full border border-gray-200 px-4 py-2 rounded-md bg-gray-50"
-              key={recipe._id}
-            >
-              <div className="flex flex-row space-x-2">
-                <Avatar className="rounded-full border w-12 h-12 " />
-                <div className="flex justify-between w-full flex-row">
-                  <div>
-                    <p className="text-sm font-medium">
-                      {recipe.createdBy?.name || "Unknown"}
-                    </p>
-                    <p className="text-xs">{timeSince(recipe?.createdOn)}</p>
+  ({ recipes, handleLikeRecipe, isLiked, handleSaveRecipe, isSaved }) => {
+    const [showFullDetails, setShowFullDetails] = useState(false);
+
+    const toggleDetails = () => {
+      setShowFullDetails((prev) => !prev); // Toggle the state
+    };
+
+    return (
+      <TabsContent value="recipes" className="">
+        <div className="flex justify-end items-end w-full pb-4">
+          <MemoizedAddRecipeButton />
+        </div>
+        <div className="space-y-4">
+          {recipes.length > 0 ? (
+            recipes.map((recipe) => (
+              <div
+                className="w-full border border-gray-200 px-4 py-2 rounded-md bg-gray-50"
+                key={recipe._id}
+              >
+                <div className="flex flex-row space-x-2">
+                  <Avatar className="rounded-full border w-12 h-12 " />
+                  <div className="flex justify-between w-full flex-row">
+                    <div>
+                      <p className="text-sm font-medium">
+                        {recipe.createdBy?.name || "Unknown"}
+                      </p>
+                      <p className="text-xs">{timeSince(recipe?.createdOn)}</p>
+                    </div>
+                    <div className="flex flex-row space-x-2 items-center">
+                      {isSaved[recipe._id] ? (
+                        <FaBookmark
+                          onClick={() => handleSaveRecipe(recipe._id)}
+                          color="yellow"
+                          size={20}
+                        />
+                      ) : (
+                        <>
+                          <FaRegBookmark
+                            onClick={() => handleSaveRecipe(recipe._id)}
+                            size={20}
+                          />
+                        </>
+                      )}
+
+                      <RecipesMenubar recipeId={recipe._id} />
+                    </div>
                   </div>
+                </div>
+                <div className="px-2 py-4">
+                  <p className="text-lg font-medium">{recipe.title}</p>
+                  <p className="text-sm">{recipe.description}</p>
+                  {!showFullDetails ? (
+                    <button
+                      onClick={toggleDetails}
+                      className="text-gray-400 text-sm font-medium mt-2"
+                    >
+                      Show more
+                    </button>
+                  ) : (
+                    <>
+                      <div>
+                        <h3 className="text-md font-medium">Ingredients</h3>
+                        <ul className="text-sm">
+                          {Array.isArray(recipe.ingredients) &&
+                            recipe.ingredients.map((ingredient, index) => (
+                              <li key={index}>{ingredient.name}</li>
+                            ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-md">Instructions</h3>
+                        <ol>
+                          {Array.isArray(recipe.instructions) &&
+                            recipe.instructions.map((instruction, index) => (
+                              <li key={index} className="text-sm">
+                                Step {index + 1}: {instruction.name}
+                              </li>
+                            ))}
+                        </ol>
+                      </div>
+                      <div>
+                        <ol className="flex flex-row space-x-2 pt-2">
+                          {Array.isArray(recipe.tags) &&
+                            recipe.tags.map((tags, index) => (
+                              <li
+                                key={index}
+                                className="text-[10px] font-medium bg-gray-200 px-2 rounded-md"
+                              >
+                                {tags}
+                              </li>
+                            ))}
+                        </ol>
+                      </div>
+                      <button
+                        onClick={toggleDetails}
+                        className="text-gray-400 text-sm font-medium mt-2"
+                      >
+                        Show less
+                      </button>
+                    </>
+                  )}
+                </div>
+                <div className="flex flex-row items-center space-x-1">
+                  <MemoizedLikes
+                    likes={recipe.likes.length}
+                    comment={recipe.comments.length}
+                  />
+                </div>
+                <div className="flex flex-row justify-between px-8 md:px-20 pt-2 border-t-2 border-gray-200">
                   <div className="flex flex-row space-x-2 items-center">
-                    {isSaved[recipe._id] ? (
-                      <FaBookmark
-                        onClick={() => handleSaveRecipe(recipe._id)}
-                        color="yellow"
+                    {isLiked[recipe._id] ? (
+                      <FaHeart
+                        onClick={() => handleLikeRecipe(recipe._id)}
+                        color="red"
                         size={20}
                       />
                     ) : (
                       <>
-                        <FaRegBookmark
-                          onClick={() => handleSaveRecipe(recipe._id)}
+                        <FaRegHeart
+                          onClick={() => handleLikeRecipe(recipe._id)}
                           size={20}
                         />
+                        <p className="text-sm">Like</p>
                       </>
                     )}
+                  </div>
 
-                    <RecipesMenubar recipeId={recipe._id} />
+                  <div className="flex flex-row space-x-2 items-center">
+                    <FaComment size={20} />
+                    <p className="text-sm">Comment</p>
                   </div>
                 </div>
               </div>
-              <div className="px-2 py-4">
-                <p className="text-lg font-medium">{recipe.title}</p>
-                <p className="text-sm">{recipe.description}</p>
-                <div>
-                  <h3 className="text-md font-medium">Ingredients</h3>
-                  <ul className="text-sm">
-                    {Array.isArray(recipe.ingredients) &&
-                      recipe.ingredients.map((ingredient, index) => (
-                        <li key={index}>{ingredient.name}</li>
-                      ))}
-                  </ul>
-                </div>
-                <div>
-                  <h3 className="font-medium text-md">Instructions</h3>
-                  <ol>
-                    {Array.isArray(recipe.instructions) &&
-                      recipe.instructions.map((instruction, index) => (
-                        <li key={index} className="text-sm">
-                          Step {index + 1}: {instruction.name}
-                        </li>
-                      ))}
-                  </ol>
-                </div>
-                <div>
-                  <ol className="flex flex-row space-x-2 pt-2">
-                    {Array.isArray(recipe.tags) &&
-                      recipe.tags.map((tags, index) => (
-                        <li
-                          key={index}
-                          className="text-[10px] font-medium bg-gray-200 px-2 rounded-md"
-                        >
-                          {tags}
-                        </li>
-                      ))}
-                  </ol>
-                </div>
-              </div>
-              <div className="flex flex-row items-center space-x-1">
-                <MemoizedLikes
-                  likes={recipe.likes.length}
-                  comment={recipe.comments.length}
-                />
-              </div>
-              <div className="flex flex-row justify-between px-8 md:px-20 pt-2 border-t-2 border-gray-200">
-                <div className="flex flex-row space-x-2 items-center">
-                  {isLiked[recipe._id] ? (
-                    <FaHeart
-                      onClick={() => handleLikeRecipe(recipe._id)}
-                      color="red"
-                      size={20}
-                    />
-                  ) : (
-                    <>
-                      <FaRegHeart
-                        onClick={() => handleLikeRecipe(recipe._id)}
-                        size={20}
-                      />
-                      <p className="text-sm">Like</p>
-                    </>
-                  )}
-                </div>
-
-                <div className="flex flex-row space-x-2 items-center">
-                  <FaComment size={20} />
-                  <p className="text-sm">Comment</p>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No recipes found.</p>
-        )}
-      </div>
-    </TabsContent>
-  )
+            ))
+          ) : (
+            <p>No recipes found.</p>
+          )}
+        </div>
+      </TabsContent>
+    );
+  }
 );
 
 export default function Profile() {

@@ -414,6 +414,12 @@ const MemoizedRecipeCard = memo(
     const [newComment, setNewComment] = useState("");
     const [comments, setComments] = useState([]);
     const [latestComment, setLatestComment] = useState([]);
+    const [showFullDetails, setShowFullDetails] = useState(false);
+
+    const toggleDetails = () => {
+      setShowFullDetails((prev) => !prev); // Toggle the state
+    };
+
 
     const handleComment = useCallback((value) => {
       setNewComment(value);
@@ -422,18 +428,13 @@ const MemoizedRecipeCard = memo(
     const fetchComments = useCallback(async () => {
       try {
         const response = await axios.get(GetCommentAPI(recipe._id));
-        console.log("response", response.data);
         const sortedComments = response.data.sort(
           (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
         );
 
-        const latestComment =
-          sortedComments.length > 0 ? [sortedComments[0]] : [];
+        const latestComment = sortedComments.length > 0 ? [sortedComments[0]] : [];
         setLatestComment(latestComment);
-
         setComments(sortedComments);
-
-        console.log("comments", sortedComments);
       } catch (error) {
         console.error("Error fetching comments:", error);
       }
@@ -446,8 +447,6 @@ const MemoizedRecipeCard = memo(
     const addComment = async (text) => {
       try {
         const token = localStorage.getItem("authToken");
-        console.log("Retrieved Token:", token);
-
         const decodedToken = token ? jwtDecode(token) : null;
         const userId = decodedToken?.userId || storedGoogleUser?._id;
 
@@ -462,118 +461,96 @@ const MemoizedRecipeCard = memo(
 
         const newCommentData = response.data.comment;
         setComments((prevComments) => [newCommentData, ...prevComments]);
-
         setNewComment("");
-
-        console.log("Comment added successfully:", newCommentData);
-
         fetchComments();
       } catch (error) {
-        console.error(
-          "Error adding comment:",
-          error.response?.data?.message || error.message
-        );
+        console.error("Error adding comment:", error.response?.data?.message || error.message);
       }
     };
 
     const memoizedRecipeCard = useMemo(() => {
       const following_id = recipe.createdBy?._id;
-      console.log("followingId", following_id);
+
       return (
-        <div
-          key={recipe._id}
-          className="border py-2 px-4 mb-4 rounded-[6px] bg-gray-100"
-        >
+        <div key={recipe._id} className="border py-2 px-4 mb-4 rounded-[6px] bg-gray-100">
           <div className="flex flex-row space-x-2 items-center">
-          <Avatar className="rounded-full border w-12 h-12"/>
+            <Avatar className="rounded-full border w-12 h-12" />
             <div className="flex flex-row items-center justify-between w-full">
               <div>
-                <p
-                  className="text-sm font-medium"
-                  onClick={() => handleViewProfile(following_id)}
-                >
+                <p className="text-sm font-medium" onClick={() => handleViewProfile(following_id)}>
                   {recipe.createdBy?.name || "Null"}
                 </p>
                 <p className="text-[12px]">{recipe.timeSince}</p>
               </div>
               <div>
                 {isSaved[recipe._id] ? (
-                  <FaBookmark
-                    onClick={() => handleSaveRecipe(recipe._id)}
-                    color="yellow"
-                    size={20}
-                  />
+                  <FaBookmark onClick={() => handleSaveRecipe(recipe._id)} color="yellow" size={20} />
                 ) : (
-                  <>
-                    <FaRegBookmark
-                      onClick={() => handleSaveRecipe(recipe._id)}
-                      size={20}
-                    />
-                  </>
+                  <FaRegBookmark onClick={() => handleSaveRecipe(recipe._id)} size={20} />
                 )}
               </div>
             </div>
           </div>
           <h3 className="text-xl font-semibold">{recipe.title}</h3>
           <p>{recipe.description}</p>
-          <div>
-            <h3 className="text-md font-medium">Ingredients</h3>
-            <ul className="text-sm">
-              {Array.isArray(recipe.ingredients) &&
-                recipe.ingredients.map((ingredient, index) => (
-                  <li key={index}>{ingredient.name}</li>
-                ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-medium text-md">Instructions</h3>
-            <ol>
-              {Array.isArray(recipe.instructions) &&
-                recipe.instructions.map((instruction, index) => (
-                  <li key={index} className="text-sm">
-                    Step {index + 1}: {instruction.name}
-                  </li>
-                ))}
-            </ol>
-          </div>
-          <div>
-            <ol className="flex flex-row space-x-2 py-2">
-              {Array.isArray(recipe.tags) &&
-                recipe.tags.map((tags, index) => (
-                  <li
-                    key={index}
-                    className="text-[10px] font-medium bg-gray-200 px-2 rounded-md"
-                  >
-                    {tags}
-                  </li>
-                ))}
-            </ol>
-          </div>
+
+          {!showFullDetails ? (
+            <button onClick={toggleDetails} className="text-gray-400 text-sm font-medium mt-2">
+              Show more
+            </button>
+          ) : (
+            <>
+              <div>
+                <h3 className="text-md font-medium">Ingredients</h3>
+                <ul className="text-sm">
+                  {Array.isArray(recipe.ingredients) && recipe.ingredients.map((ingredient, index) => (
+                    <li key={index}>{ingredient.name}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-medium text-md">Instructions</h3>
+                <ol>
+                  {Array.isArray(recipe.instructions) && recipe.instructions.map((instruction, index) => (
+                    <li key={index} className="text-sm">
+                      Step {index + 1}: {instruction.name}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <div>
+                <ol className="flex flex-row space-x-2 py-2">
+                  {Array.isArray(recipe.tags) && recipe.tags.map((tags, index) => (
+                    <li key={index} className="text-[10px] font-medium bg-gray-200 px-2 rounded-md">
+                      {tags}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <button
+                onClick={toggleDetails}
+                className="text-gray-400 text-sm font-medium mt-2"
+              >
+                Show less
+              </button>
+            </>
+          )}
+
           <div className="flex flex-row items-center space-x-1">
-            <MemoizedLikes
-              likes={recipe.likes.length}
-              comment={recipe.comments.length}
-            />
+            <MemoizedLikes likes={recipe.likes.length} comment={recipe.comments.length} />
           </div>
+
           <div className="flex flex-row justify-between px-6 md:px-20 pt-2 border-t-2 pb-2 border-gray-200">
             <div className="flex flex-row space-x-2 items-center">
               {isLiked[recipe._id] ? (
-                <FaHeart
-                  onClick={() => handleLikeRecipe(recipe._id)}
-                  color="red"
-                  size={20}
-                />
+                <FaHeart onClick={() => handleLikeRecipe(recipe._id)} color="red" size={20} />
               ) : (
                 <>
-                  <FaRegHeart
-                    onClick={() => handleLikeRecipe(recipe._id)}
-                    size={20}
-                  />
+                  <FaRegHeart onClick={() => handleLikeRecipe(recipe._id)} size={20} />
                   <p className="text-sm">Like</p>
                 </>
               )}
             </div>
-
             <div className="flex flex-row space-x-2 items-center">
               <p className="text-sm">
                 <CommentButtonDialog
@@ -590,37 +567,19 @@ const MemoizedRecipeCard = memo(
               </p>
             </div>
           </div>
-          <div className="border-t-2 border-gray-200 ">
-            <div className="">
-              <CommentsDialog
-                addComment={addComment}
-                handleComment={handleComment}
-                newComment={newComment}
-                recipe={recipe}
-                comments={comments}
-                isSaved={isSaved}
-                isLiked={isLiked}
-                handleLikeRecipe={handleLikeRecipe}
-                handleSaveRecipe={handleSaveRecipe}
-              />
-            </div>
+
+          <div className="border-t-2 border-gray-200">
             <div className="flex flex-col py-2">
               {latestComment.map((comment) => (
-                <div className="">
-                  <div
-                    key={comment._id}
-                    className="flex flex-col py-1 px-4 bg-gray-200 rounded-md mb-1"
-                  >
-                    <p className="text-xs">{comment.user?.name}</p>
-                    <p className="text-xs">{comment.text}</p>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    {timeSince(comment.createdOn)}
-                  </p>
+                <div key={comment._id} className="flex flex-col py-1 px-4 bg-gray-200 rounded-md mb-1">
+                  <p className="text-xs">{comment.user?.name}</p>
+                  <p className="text-xs">{comment.text}</p>
+                  <p className="text-xs text-gray-500">{timeSince(comment.createdOn)}</p>
                 </div>
               ))}
             </div>
           </div>
+
           <MemoizedCommentInput
             addComment={addComment}
             handleComment={handleComment}
@@ -636,11 +595,13 @@ const MemoizedRecipeCard = memo(
       comments,
       latestComment,
       newComment,
+      showFullDetails,
     ]);
 
     return memoizedRecipeCard;
   }
 );
+
 
 const MemoizedRecipe = memo(
   ({
