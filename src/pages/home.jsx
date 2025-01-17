@@ -38,16 +38,18 @@ const MemoizedLikes = memo(({ likes, comment, share }) => {
   return (
     <>
       <div className="flex flex-row justify-between w-full">
-        <div className="flex flex-row items-center ">
-          <FaHeart size={16} color="red" />
-          <p className="text-sm ml-1">{likes}</p>
-        </div>
-        <div className="flex flex-row space-x-8">
-          <div className="flex flex-row items-center">
-            <FaComment size={16} />
-            <p className="text-xs ml-1">{comment} comments</p>
-          </div>
-        </div>
+          {likes > 0 && (
+             <div className="flex items-center space-x-1">
+               <FaHeart size={16} color="red" />
+               <p className="text-sm">{likes}</p>
+             </div>
+            )}
+             {comment > 0 && (
+               <div className="flex items-center space-x-1">
+                 <FaComment />
+                 <p className="text-sm">{comment} {comment === 1 ? 'comment' : 'comments'}</p>
+               </div>
+             )}
       </div>
     </>
   );
