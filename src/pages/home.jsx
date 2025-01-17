@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Avatar from "../components/avatar"
 
 import "../App.css";
 import { useNavigate } from "react-router-dom";
@@ -102,7 +103,7 @@ const CommentsDialog = memo(
           <DialogDescription>
             <div className="mb-4">
               <div className="flex flex-row items-center space-x-2">
-                <div className="p-4 md:p-6 rounded-full bg-gray-200" />
+              <Avatar className="rounded-full border w-12 h-12"/>
                 <div className="flex flex-row items-center justify-between w-full">
                   <div>
                     <p
@@ -256,7 +257,7 @@ const CommentButtonDialog = memo(
           <DialogDescription>
             <div className="mb-4">
               <div className="flex flex-row space-x-2 items-center">
-                <div className="p-6 rounded-full bg-gray-200" />
+              <Avatar className="rounded-full border w-12 h-12"/>
                 <div className="flex flex-row items-center justify-between w-full">
                   <div>
                     <p
@@ -482,7 +483,7 @@ const MemoizedRecipeCard = memo(
           className="border py-2 px-4 mb-4 rounded-[6px] bg-gray-100"
         >
           <div className="flex flex-row space-x-2 items-center">
-            <div className="p-6 rounded-full bg-gray-200" />
+          <Avatar className="rounded-full border w-12 h-12"/>
             <div className="flex flex-row items-center justify-between w-full">
               <div>
                 <p

@@ -14,6 +14,7 @@ import {
 import AddRecipeButton from "../components/addRecipeButton";
 import EditProfileButton from "../components/editProfileButton";
 import { RecipesMenubar } from "../components/recipesMenubar";
+import Avatar from "../components/avatar";
 
 const MemoizedUsername = memo(({ name }) => {
   return (
@@ -70,7 +71,7 @@ const MemoizedLikedRecipes = memo(
                 className="mb-4 bg-gray-100 px-4 py-2 border border-gray-200 rounded-md"
               >
                 <div className="flex flex-row space-x-2">
-                  <div className="p-6 bg-gray-200 rounded-full" />
+                <Avatar className="rounded-full border w-12 h-12"/>
                   <div className="flex justify-between w-full flex-row">
                     <div className="flex justify-center flex-col">
                       <p className="text-sm font-medium">
@@ -152,7 +153,7 @@ const MemoizedSavedRecipes = memo(
                 className="mb-4 bg-gray-100 px-4 py-2 border border-gray-200 rounded-md"
               >
                 <div className="flex flex-row space-x-2">
-                  <div className="p-6 bg-gray-200 rounded-full" />
+                <Avatar className="rounded-full border w-12 h-12"/>
                   <div className="flex justify-between w-full flex-row">
                     <div className="flex justify-center flex-col">
                       <p className="text-sm font-medium">
@@ -236,7 +237,7 @@ const MemoizedRecipeLists = memo(
               key={recipe._id}
             >
               <div className="flex flex-row space-x-2">
-                <div className="p-6 bg-gray-200 rounded-full" />
+              <Avatar className="rounded-full border w-12 h-12"/>
                 <div className="flex justify-between w-full flex-row">
                   <div>
                     <p className="text-sm font-medium">
@@ -501,7 +502,8 @@ export default function Profile() {
     <div className="py-20 md:py-28 md:px-12">
       <div className="flex-1 flex flex-col">
         <div className="p-6 flex flex-row space-x-6">
-          <div className="p-12 md:p-16 rounded-full bg-gray-200"></div>
+        <Avatar className="rounded-full border w-16 h-16"/>
+
           <MemoizedUsername name={userData?.name} />
         </div>
         <div className="flex flex-row space-x-12 px-6">
