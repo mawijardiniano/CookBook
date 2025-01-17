@@ -137,7 +137,7 @@ const Navbar = () => {
             </div>
           )}
 
-          <div className="flex items-center md:space-x-6">
+          <div className="flex items-center md:space-x-6 ml-auto ">
             <Notification
               className="text-gray-500 hover:text-gray-700"
               size={20}
@@ -147,7 +147,6 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 h-full bg-white shadow-lg z-40 transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"

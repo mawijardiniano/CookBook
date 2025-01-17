@@ -25,12 +25,22 @@ const MemoizedUsername = memo(({ name }) => {
   );
 });
 
-const MemoizedLikes = memo(({ likes }) => {
+const MemoizedLikes = memo(({ likes, comment }) => {
   return (
-    <>
-      <FaHeart size={16} color="red" />
-      <p className="text-sm">{likes}</p>
-    </>
+    <div className="flex flex-row justify-between w-full px-6">
+     {likes > 0 && (
+      <div className="flex items-center space-x-1">
+        <FaHeart size={16} color="red" />
+        <p className="text-sm">{likes}</p>
+      </div>
+     )}
+      {comment > 0 && (
+        <div className="flex items-center space-x-1">
+          <FaComment />
+          <p className="text-sm">{comment} {comment === 1 ? 'comment' : 'comments'}</p>
+        </div>
+      )}
+    </div>
   );
 });
 
@@ -71,7 +81,7 @@ const MemoizedLikedRecipes = memo(
                 className="mb-4 bg-gray-100 px-4 py-2 border border-gray-200 rounded-md"
               >
                 <div className="flex flex-row space-x-2">
-                <Avatar className="rounded-full border w-12 h-12"/>
+                  <Avatar className="rounded-full border w-12 h-12" />
                   <div className="flex justify-between w-full flex-row">
                     <div className="flex justify-center flex-col">
                       <p className="text-sm font-medium">
@@ -102,7 +112,7 @@ const MemoizedLikedRecipes = memo(
                 <h3 className="mt-4 text-lg font-semibold">{recipe.title}</h3>
                 <p className="text-sm">{recipe.description}</p>
                 <div className="flex flex-row items-center space-x-1">
-                  <MemoizedLikes likes={recipe.likes.length} />
+                  <MemoizedLikes likes={recipe.likes.length}   comment={recipe.comments.length} />
                 </div>
                 <div className="flex flex-row justify-between px-8 md:px-20 pt-2 border-t-2 border-gray-200">
                   <div className="flex flex-row space-x-2 items-center">
@@ -127,7 +137,6 @@ const MemoizedLikedRecipes = memo(
                     <FaComment size={20} />
                     <p className="text-sm">Comment</p>
                   </div>
-
                 </div>
               </div>
             ))
@@ -153,7 +162,7 @@ const MemoizedSavedRecipes = memo(
                 className="mb-4 bg-gray-100 px-4 py-2 border border-gray-200 rounded-md"
               >
                 <div className="flex flex-row space-x-2">
-                <Avatar className="rounded-full border w-12 h-12"/>
+                  <Avatar className="rounded-full border w-12 h-12" />
                   <div className="flex justify-between w-full flex-row">
                     <div className="flex justify-center flex-col">
                       <p className="text-sm font-medium">
@@ -184,7 +193,7 @@ const MemoizedSavedRecipes = memo(
                 <h3 className="mt-4 text-lg font-semibold">{recipe.title}</h3>
                 <p className="text-sm">{recipe.description}</p>
                 <div className="flex flex-row items-center space-x-1">
-                  <MemoizedLikes likes={recipe.likes.length} />
+                  <MemoizedLikes likes={recipe.likes.length}   comment={recipe.comments.length} />
                 </div>
                 <div className="flex flex-row justify-between px-8 md:px-20 pt-2 border-t-2 border-gray-200">
                   <div className="flex flex-row space-x-2 items-center">
@@ -237,7 +246,7 @@ const MemoizedRecipeLists = memo(
               key={recipe._id}
             >
               <div className="flex flex-row space-x-2">
-              <Avatar className="rounded-full border w-12 h-12"/>
+                <Avatar className="rounded-full border w-12 h-12 " />
                 <div className="flex justify-between w-full flex-row">
                   <div>
                     <p className="text-sm font-medium">
@@ -303,7 +312,10 @@ const MemoizedRecipeLists = memo(
                 </div>
               </div>
               <div className="flex flex-row items-center space-x-1">
-                <MemoizedLikes likes={recipe.likes.length} />
+                <MemoizedLikes
+                  likes={recipe.likes.length}
+                  comment={recipe.comments.length}
+                />
               </div>
               <div className="flex flex-row justify-between px-8 md:px-20 pt-2 border-t-2 border-gray-200">
                 <div className="flex flex-row space-x-2 items-center">
@@ -502,7 +514,7 @@ export default function Profile() {
     <div className="py-20 md:py-28 md:px-12">
       <div className="flex-1 flex flex-col">
         <div className="p-6 flex flex-row space-x-6">
-        <Avatar className="rounded-full border w-16 h-16"/>
+          <Avatar className="rounded-full border w-16 h-16 md:h-20 md:w-20" />
 
           <MemoizedUsername name={userData?.name} />
         </div>
