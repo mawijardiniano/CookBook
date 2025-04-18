@@ -377,7 +377,6 @@ const UsersProfile = () => {
 
       console.log("User unfollowed", response.data);
 
-      // Update followings in state and localStorage
       const updatedFollowings = followings.filter(
         (following) => following._id !== id
       );

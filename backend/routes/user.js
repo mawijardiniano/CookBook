@@ -16,7 +16,7 @@ const router = express.Router();
 
 router.post("/signup", userSignup);
 router.post("/login", userLogin);
-router.post("/google-login", googleLogin);
+router.post("/google-login", googleLogin);  
 router.post("/follow/:userId",authenticateToken, FollowUser);
 router.post("/unfollow/:userId",authenticateToken, UnFollow);
 router.put("/edit/:userId", editUsername)

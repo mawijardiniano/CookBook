@@ -14,11 +14,7 @@ export default function SavedRecipes() {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
-
-
         <div className="flex-1 flex flex-col">
-
-
           <div className="p-6">
             <p>SavedRecipes</p>
           </div>
